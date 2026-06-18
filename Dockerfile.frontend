@@ -1,0 +1,21 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files first
+COPY frontend/package.json frontend/package-lock.json* ./
+
+RUN npm install --legacy-peer-deps
+
+# Copy source code
+COPY frontend/ .
+
+# Build the project (if you want to serve static, but we'll use Vite's dev server or preview for the web app as requested, wait:
+# The user wants "La aplicación debe exponerse en: Frontend: http://localhost:3000"
+# Vite default is 5173, we will run `npm run dev -- --port 3000 --host 0.0.0.0` or preview.
+# For a production-ready approach, let's just run dev server as it's common for these test setups, or build and serve.
+# We will use dev server since the prompt says: "When running locally, use npm run dev or equivalent dev server. Only build the production bundle if the USER explicitly requests it".
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]

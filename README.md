@@ -1,333 +1,49 @@
-# Job Radar
+# Job Radar Web Application
 
-## Descripción
+Aplicación web Full Stack para analizar y puntuar vacantes de trabajo (Job Radar), ahora con interfaz de usuario moderna y Dockerizada.
 
-Job Radar es una plataforma de inteligencia laboral diseñada para recopilar, normalizar, analizar y notificar vacantes de múltiples empresas y portales de empleo.
+## Arquitectura
 
-El sistema está construido bajo una arquitectura extensible basada en colectores (Collectors), permitiendo agregar nuevas fuentes de vacantes sin modificar el núcleo de la aplicación.
+- **Backend**: FastAPI (Python 3.11). Expone endpoints para consultar trabajos cacheados en memoria y refrescarlos re-ejecutando los scrapers.
+- **Frontend**: React + Vite + TypeScript con TailwindCSS. Proporciona una interfaz moderna con filtros, tarjetas y dashboard.
+- **Infraestructura**: Docker y Docker Compose para levantar ambos servicios.
 
-Ejemplos de fuentes:
+## Despliegue
 
-* EPAM Careers
-* softek Careers
-* Aws Labs Careers
-* New Relic Careers
-* Dynatrace Careers
-* Oracle Careers
-* Microsoft Careers
+Asegúrate de tener instalado [Docker](https://docs.docker.com/get-docker/) y Docker Compose.
 
----
+1. Clona el repositorio y ubícate en la carpeta raíz.
+2. Construye y levanta los contenedores:
+   ```bash
+   docker compose up --build
+   ```
+3. Accede a la aplicación:
+   - Frontend: [http://localhost:3000](http://localhost:3000)
+   - Backend API Docs: [http://localhost:8000/docs](http://localhost:8000/docs)
 
-# Objetivos
+## Estructura de Carpetas
 
-* Detectar nuevas vacantes automáticamente.
-* Evitar vacantes duplicadas.
-* Clasificar oportunidades según el perfil profesional del usuario.
-* Analizar vacantes utilizando IA.
-* Generar alertas por Telegram.
-* Mantener histórico de tendencias tecnológicas.
-* Facilitar la incorporación de nuevas fuentes de empleo.
-
----
-
-# Arquitectura General
-
-```text
-                   Scheduler
-                        |
-                        V
-                 Collector Service
-                        |
-        +---------------+---------------+
-        |               |               |
-        V               V               V
-
-   EPAM API      softek API     Aws API
-
-        +---------------+---------------+
-                        |
-                        V
-
-                  Normalizer
-                        |
-                        V
-
-                   PostgreSQL
-                        |
-                        V
-
-                  Match Engine
-                        |
-                        V
-
-                   AI Analysis
-                        |
-                        V
-
-                 Notifications
+```
+project/
+├── backend/                  # Código FastAPI y scrapers
+│   ├── app/                  # Lógica de la aplicación
+│   ├── requirements.txt      # Dependencias de Python
+├── frontend/                 # Proyecto React (Vite)
+├── docker-compose.yml        # Orquestación de servicios
+├── Dockerfile.backend        # Imagen de Docker para el backend
+├── Dockerfile.frontend       # Imagen de Docker para el frontend
+└── README.md                 # Este archivo
 ```
 
----
+## Endpoints Principales (Backend)
 
-# Flujo de ejecución
+- `GET /jobs`: Retorna las vacantes (con soporte para filtros: `company`, `min_score`, `search`).
+- `GET /jobs/top`: Retorna el top N de vacantes (default 10).
+- `POST /refresh`: Dispara la recolección de datos y la evaluación en segundo plano.
 
-1. Scheduler ejecuta el proceso.
-2. Cada Collector consulta una fuente de empleo.
-3. Los resultados se normalizan.
-4. Se almacenan en PostgreSQL.
-5. Se detectan nuevas vacantes.
-6. Se calcula un Match Score.
-7. La IA analiza la vacante.
-8. Se envía una notificación.
+## Mejoras Futuras Recomendadas
 
----
-
-# Estructura del proyecto
-
-```text
-job-radar/
-
-├── app/
-│
-├── collectors/
-│   ├── base.py
-│   ├── epam.py
-│   ├── softek.py
-│   ├── Aws.py
-│   └── ...
-│
-├── models/
-│   └── job.py
-│
-├── repositories/
-│   └── job_repository.py
-│
-├── services/
-│   ├── collector_service.py
-│   ├── matcher_service.py
-│   ├── notification_service.py
-│   └── ai_service.py
-│
-├── database/
-│   ├── db.py
-│   └── models.py
-│
-├── scheduler/
-│   └── scheduler.py
-│
-├── config/
-│   └── settings.py
-│
-├── tests/
-│
-├── Dockerfile
-├── docker-compose.yml
-├── requirements.txt
-└── README.md
-```
-
----
-
-# Concepto de Collector
-
-Cada empresa implementa un Collector.
-
-Ejemplo:
-
-```python
-class EpamCollector(BaseCollector):
-
-    def collect(self):
-        pass
-```
-
-Todos los Collectors deben devolver el mismo modelo de datos.
-
----
-
-# Modelo Job
-
-```python
-@dataclass
-class Job:
-
-    external_id: str
-
-    source: str
-
-    title: str
-
-    description: str
-
-    url: str
-
-    skills: list[str]
-
-    countries: list[str]
-
-    vacancy_type: str
-
-    created_at: str
-```
-
----
-
-# Base de Datos
-
-## jobs
-
-Almacena las vacantes normalizadas.
-
-Campos principales:
-
-* source
-* external_id
-* title
-* url
-* created_at
-
-Restricción:
-
-```sql
-UNIQUE(source, external_id)
-```
-
-Esto evita registros duplicados.
-
----
-
-# Match Engine
-
-El Match Engine calcula qué tan compatible es una vacante con el perfil del usuario.
-
-Ejemplo:
-
-| Skill      | Peso |
-| ---------- | ---- |
-| Python     | 20   |
-| Docker     | 20   |
-| Linux      | 20   |
-| Kubernetes | 15   |
-| New Relic  | 15   |
-| Terraform  | 10   |
-
-Resultado:
-
-```text
-Senior Python Engineer
-
-Match Score: 92
-```
-
----
-
-# Integración con IA
-
-La IA analiza:
-
-* Compatibilidad
-* Tecnologías faltantes
-* Riesgos
-* Recomendaciones
-
-Ejemplo:
-
-```text
-Compatibilidad: 92%
-
-Fortalezas:
-- Python
-- Docker
-- Linux
-
-Faltantes:
-- Terraform
-
-Recomendación:
-Aplicar
-```
-
----
-
-# Notificaciones
-
-Inicialmente:
-
-* Telegram
-
-Futuro:
-
-* Gmail
-* Discord
-* Slack
-
----
-
-# Configuración
-
-Archivo:
-
-```yaml
-collectors:
-
-  epam:
-    enabled: true
-
-  softek:
-    enabled: true
-
-  Aws:
-    enabled: false
-```
-
-Permite habilitar o deshabilitar fuentes sin modificar código.
-
----
-
-# Roadmap
-
-## Fase 1
-
-* EPAM Collector
-* PostgreSQL
-* Detección de nuevas vacantes
-
-## Fase 2
-
-* Telegram
-* Match Engine
-
-## Fase 3
-
-* Gemini
-* Análisis automático
-
-## Fase 4
-
-* softek Collector
-* Aws Collector
-* New Relic Collector
-
-## Fase 5
-
-* Dashboard Web
-* Estadísticas históricas
-* Tendencias tecnológicas
-
----
-
-# Principios de diseño
-
-* Cada empresa debe tener su propio Collector.
-* Nunca mezclar lógica de distintas empresas.
-* Todo dato debe normalizarse antes de almacenarse.
-* El núcleo de la aplicación no debe depender de una fuente específica.
-* Agregar una nueva empresa debe requerir únicamente crear un nuevo Collector.
-* Evitar scraping cuando exista API pública.
-* Mantener la aplicación Dockerizada desde el inicio.
-
----
-
-# Meta final
-
-Construir una plataforma capaz de monitorear cientos de fuentes de empleo, detectar oportunidades relevantes automáticamente y generar inteligencia laboral basada en tendencias, compatibilidad y análisis asistido por IA.
+1. **Base de Datos Persistente**: Sustituir la caché en memoria por una base de datos real (PostgreSQL o MongoDB) para mantener histórico de vacantes.
+2. **Tareas Programadas (Cron)**: Configurar Celery o el programador interno para actualizar las vacantes automáticamente cada N horas.
+3. **Paginación Avanzada**: Implementar paginación en el backend y frontend para manejar miles de registros eficientemente.
+4. **Autenticación**: Añadir un login simple si la herramienta es para uso privado de un equipo de reclutamiento o para candidatos específicos.
