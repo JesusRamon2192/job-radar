@@ -21,7 +21,10 @@ class EpamCollector(BaseCollector):
             }
         )
 
-        return response.json()["data"]["jobs"]
+        jobs = response.json()["data"]["jobs"]
+        for job in jobs:
+            job["company"] = "EPAM"
+        return jobs
 
 if __name__ == "__main__":
 

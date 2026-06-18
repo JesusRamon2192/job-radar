@@ -3,6 +3,8 @@ PROFILE = {
     "cloud": [
         "Amazon Web Services",
         "Google Cloud Platform",
+        "Microsoft Azure",
+        "Azure",
         "Cloud Native Development"
     ],
     "containers": [
@@ -12,11 +14,16 @@ PROFILE = {
     ],
 
     "devops": [
+        "DevOps",
         "Linux",
         "CI/CD",
         "GitLab",
         "Git",
-        "Github"
+        "API Testing",
+        "API",
+        "Github",
+        "QA",
+        "Test"
     ],
 
     "ai": [

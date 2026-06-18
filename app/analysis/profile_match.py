@@ -1,10 +1,18 @@
 from app.collectors.epam import EpamCollector
+from app.collectors.softek import SoftekCollector
 from app.services.matcher_service import MatcherService
 
-collector = EpamCollector()
+epam_collector = EpamCollector()
+softek_collector = SoftekCollector()
 matcher = MatcherService()
 
-jobs = collector.collect()
+epam_jobs = epam_collector.collect()
+softek_jobs = softek_collector.collect()
+
+print(f"Vacantes EPAM obtenidas: {len(epam_jobs)}")
+print(f"Vacantes Softtek obtenidas: {len(softek_jobs)}")
+
+jobs = epam_jobs + softek_jobs
 
 results = []
 
@@ -15,13 +23,17 @@ for job in jobs:
     seo = job.get("seo") or {}
     url_path = seo.get("url", "")
     full_url = f"https://careers.epam.com{url_path}" if url_path else "N/A"
+    
+    if job.get("company") == "Softtek":
+        full_url = job.get("url", "https://jobs.softtek.com/")
 
     results.append({
-        "title": job["name"],
+        "title": job.get("name", "N/A"),
         "score": result["score"],
         "matches": result["matches"],
         "skills": job.get("skills", []),
-        "url": full_url
+        "url": full_url,
+        "company": job.get("company", "Desconocida")
     })
 
 results.sort(
@@ -29,19 +41,31 @@ results.sort(
     reverse=True
 )
 
-for job in results[:10]:
+from collections import defaultdict
 
-    print("\n" + "=" * 80)
+jobs_by_company = defaultdict(list)
+for job in results:
+    if job["score"] > 0:
+        jobs_by_company[job["company"]].append(job)
 
-    print(f"Titulo : {job['title']}")
-    print(f"Score  : {job['score']}")
-    print(f"URL    : {job['url']}")
+for company, company_jobs in jobs_by_company.items():
+    print(f"\n\n{'#' * 80}")
+    print(f"### TOP 10 VACANTES - {company.upper()} ###")
+    print(f"{'#' * 80}")
+    
+    for job in company_jobs[:10]:
+        print("\n" + "=" * 80)
 
-    print("\nMatches:")
+        print(f"Titulo : {job['title']}")
+        print(f"Score  : {job['score']}")
+        print(f"URL    : {job['url']}")
+        print(f"Compañia : {job['company']}")
 
-    for category, skills in job["matches"].items():
+        print("\nMatches:")
 
-        print(f"  {category}: {', '.join(skills)}")
+        for category, skills in job["matches"].items():
 
-    print("\nSkills:")
-    print(", ".join(job["skills"]))
+            print(f"  {category}: {', '.join(skills)}")
+
+        print("\nSkills:")
+        print(", ".join(job["skills"]))
