@@ -45,7 +45,8 @@ from collections import defaultdict
 
 jobs_by_company = defaultdict(list)
 for job in results:
-    jobs_by_company[job["company"]].append(job)
+    if job["score"] > 0:
+        jobs_by_company[job["company"]].append(job)
 
 for company, company_jobs in jobs_by_company.items():
     print(f"\n\n{'#' * 80}")
