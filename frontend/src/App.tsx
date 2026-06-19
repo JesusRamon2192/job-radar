@@ -3,7 +3,7 @@ import { Header } from './components/Header';
 import { DashboardStats } from './components/DashboardStats';
 import { JobFilters } from './components/JobFilters';
 import { JobCard } from './components/JobCard';
-import { fetchJobs, refreshJobs } from './api/jobs';
+import { fetchJobs } from './api/jobs';
 import type { Job } from './api/jobs';
 
 function App() {
@@ -41,15 +41,6 @@ function App() {
     return () => clearInterval(interval);
   }, [isRefreshing, company, minScore, search]);
 
-  const handleRefresh = async () => {
-    try {
-      await refreshJobs();
-      setIsRefreshing(true);
-    } catch (error) {
-      console.error("Failed to trigger refresh", error);
-    }
-  };
-
   // Get unique companies from the full dataset for the dropdown
   // We'll just derive it from current jobs, though ideally it should come from the API
   const companies = Array.from(new Set(jobs.map(j => j.company)));
@@ -57,12 +48,10 @@ function App() {
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-indigo-500/30 pb-20">
       <Header 
-        onRefresh={handleRefresh} 
-        isRefreshing={isRefreshing} 
         lastUpdated={lastUpdated} 
       />
       
-      <main className="container mx-auto px-4 mt-8 max-w-6xl">
+      <main className="container mx-auto px-4 mt-8 max-w-6xl min-[1600px]:max-w-[1536px]">
         <DashboardStats jobs={jobs} />
         
         <JobFilters 
@@ -82,7 +71,7 @@ function App() {
             <p className="text-sm mt-2">Try adjusting your filters or triggering a refresh.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 min-[1600px]:grid-cols-3 gap-4 items-start">
             {jobs.map((job, idx) => (
               <JobCard key={`${job.url}-${idx}`} job={job} />
             ))}
