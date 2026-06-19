@@ -1,12 +1,20 @@
-from fastapi import FastAPI, BackgroundTasks, HTTPException
+from fastapi import FastAPI, BackgroundTasks, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
 import asyncio
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from app.analysis.api_adapter import run_profile_match
+from app.database.db import get_db, engine, Base, SessionLocal
+from app.repositories.job_repository import JobRepository
+from app.models.job import JobModel
 
 app = FastAPI(title="Job Radar API")
+
+scheduler = BackgroundScheduler()
+
 
 # Configure CORS for frontend
 app.add_middleware(
@@ -17,72 +25,82 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# In-memory cache for jobs
-_JOBS_CACHE = {
-    "jobs": [],
-    "last_updated": None,
-    "is_refreshing": False
+# In-memory state for refresh status
+_STATE = {
+    "is_refreshing": False,
+    "last_updated": None
 }
 
 def refresh_jobs_task():
-    global _JOBS_CACHE
-    _JOBS_CACHE["is_refreshing"] = True
+    global _STATE
+    _STATE["is_refreshing"] = True
+    db = SessionLocal()
     try:
         data = run_profile_match()
-        _JOBS_CACHE["jobs"] = data["jobs"]
-        _JOBS_CACHE["last_updated"] = data["last_updated"]
+        repo = JobRepository(db)
+        repo.save_all(data["jobs"])
+        _STATE["last_updated"] = data["last_updated"]
+    except Exception as e:
+        print(f"Error refreshing jobs: {e}")
     finally:
-        _JOBS_CACHE["is_refreshing"] = False
+        db.close()
+        _STATE["is_refreshing"] = False
 
 @app.on_event("startup")
 async def startup_event():
-    # Trigger an initial fetch if cache is empty
-    if not _JOBS_CACHE["jobs"] and not _JOBS_CACHE["is_refreshing"]:
-        background_tasks = BackgroundTasks()
-        background_tasks.add_task(refresh_jobs_task)
-        # We don't await background tasks directly here, we just run it sync for simplicity
-        # Or better, run it in a thread
-        loop = asyncio.get_event_loop()
-        loop.run_in_executor(None, refresh_jobs_task)
+    # Create tables
+    Base.metadata.create_all(bind=engine)
+    
+    # Schedule daily job
+    scheduler.add_job(refresh_jobs_task, 'cron', hour=0, minute=0)
+    scheduler.start()
+    
+    # Trigger an initial fetch if DB is empty
+    db = SessionLocal()
+    try:
+        repo = JobRepository(db)
+        count = db.query(JobModel).count()
+        if count == 0 and not _STATE["is_refreshing"]:
+            loop = asyncio.get_event_loop()
+            loop.run_in_executor(None, refresh_jobs_task)
+    finally:
+        db.close()
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    scheduler.shutdown()
+
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "last_updated": _JOBS_CACHE["last_updated"]}
+    return {"status": "ok", "last_updated": _STATE["last_updated"]}
 
 @app.get("/jobs")
 def get_jobs(
     company: Optional[str] = None,
     min_score: Optional[int] = None,
-    search: Optional[str] = None
+    search: Optional[str] = None,
+    db: Session = Depends(get_db)
 ):
-    jobs = _JOBS_CACHE["jobs"]
-    
-    if company:
-        jobs = [j for j in jobs if j.get("company", "").lower() == company.lower()]
-    
-    if min_score is not None:
-        jobs = [j for j in jobs if j.get("score", 0) >= min_score]
-        
-    if search:
-        s = search.lower()
-        jobs = [j for j in jobs if s in j.get("title", "").lower() or s in " ".join(j.get("skills", [])).lower()]
+    repo = JobRepository(db)
+    jobs = repo.get_all_jobs(company=company, min_score=min_score, search=search)
         
     return {
         "jobs": jobs,
         "total": len(jobs),
-        "last_updated": _JOBS_CACHE["last_updated"],
-        "is_refreshing": _JOBS_CACHE["is_refreshing"]
+        "last_updated": _STATE["last_updated"],
+        "is_refreshing": _STATE["is_refreshing"]
     }
 
 @app.get("/jobs/top")
-def get_top_jobs(limit: int = 10):
-    jobs = _JOBS_CACHE["jobs"]
-    # ya estan ordenados
-    return {"jobs": jobs[:limit]}
+def get_top_jobs(limit: int = 10, db: Session = Depends(get_db)):
+    repo = JobRepository(db)
+    jobs = repo.get_all_jobs(limit=limit)
+    return {"jobs": jobs}
 
 @app.post("/refresh")
 def refresh_jobs(background_tasks: BackgroundTasks):
-    if _JOBS_CACHE["is_refreshing"]:
+    if _STATE["is_refreshing"]:
         return {"status": "already refreshing", "message": "A refresh is already in progress"}
         
     background_tasks.add_task(refresh_jobs_task)

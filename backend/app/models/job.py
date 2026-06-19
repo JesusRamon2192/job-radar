@@ -1,22 +1,15 @@
-from dataclasses import dataclass
+from sqlalchemy import Column, Integer, String, JSON, DateTime
+from datetime import datetime
+from app.database.db import Base
 
-@dataclass
-class Job:
+class JobModel(Base):
+    __tablename__ = "jobs"
 
-    external_id: str
-
-    source: str
-
-    title: str
-
-    description: str
-
-    url: str
-
-    skills: list
-
-    countries: list
-
-    vacancy_type: str
-
-    created_at: str
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, index=True)
+    score = Column(Integer)
+    matches = Column(JSON)
+    skills = Column(JSON)
+    url = Column(String)
+    company = Column(String, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
