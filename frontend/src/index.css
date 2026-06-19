@@ -5,3 +5,162 @@
     @apply bg-slate-900 text-slate-100 antialiased selection:bg-indigo-500/30;
   }
 }
+
+/* 
+  Mobile Optimizations 
+  Targeting devices < 768px
+*/
+@media (max-width: 768px) {
+  /* 1. Header */
+  .job-radar-header .header-content {
+    height: 56px !important;
+  }
+  .job-radar-header .logo-icon {
+    padding: 6px !important;
+  }
+  .job-radar-header .logo-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  .job-radar-header .logo-text {
+    font-size: 1.125rem !important; /* text-lg */
+  }
+  .job-radar-header .refresh-btn {
+    padding: 8px !important;
+    border-radius: 50% !important;
+    width: 36px !important;
+    height: 36px !important;
+    justify-content: center !important;
+  }
+  .job-radar-header .refresh-btn .refresh-text {
+    display: none !important;
+  }
+
+  /* 2. KPI Cards */
+  .kpi-container {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+  .kpi-card {
+    flex-direction: column !important;
+    justify-content: center !important;
+    padding: 12px 4px !important;
+    height: 90px !important;
+    gap: 8px !important;
+    text-align: center !important;
+  }
+  .kpi-card .kpi-icon {
+    padding: 6px !important;
+  }
+  .kpi-card .kpi-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  .kpi-card .kpi-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .kpi-card .kpi-label {
+    font-size: 0.65rem !important;
+    line-height: 1 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+  }
+  .kpi-card .kpi-value {
+    font-size: 1.125rem !important;
+    line-height: 1 !important;
+  }
+
+  /* 3. Filtros */
+  .filters-container {
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+  }
+  .filters-search-wrapper {
+    margin-bottom: 0 !important;
+  }
+
+  /* 4. Tarjetas de Vacantes */
+  .job-card {
+    padding: 16px !important;
+    position: relative !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  }
+  .job-card:active {
+    transform: translateY(-2px) scale(0.99) !important;
+    box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.1) !important;
+  }
+  .job-card-header {
+    padding-right: 48px !important;
+  }
+  .job-title {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 8px !important;
+  }
+  .job-metadata {
+    margin-top: 0 !important;
+    gap: 12px !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* 5. Score flotante */
+  .job-score {
+    position: absolute !important;
+    top: 16px !important;
+    right: 16px !important;
+    min-width: unset !important;
+    height: unset !important;
+    padding: 4px 8px !important;
+    flex-direction: row !important;
+    gap: 4px !important;
+    border-radius: 9999px !important;
+  }
+  .job-score .score-label {
+    display: none !important;
+  }
+  .job-score .score-value {
+    font-size: 0.875rem !important;
+  }
+  
+  /* Score Colors for Mobile */
+  .job-score[data-mobile-tier="high"] {
+    color: #34d399 !important; /* emerald-400 */
+    background-color: rgba(52, 211, 153, 0.1) !important;
+    border-color: rgba(52, 211, 153, 0.2) !important;
+  }
+  .job-score[data-mobile-tier="medium"] {
+    color: #fbbf24 !important; /* amber-400 */
+    background-color: rgba(251, 191, 36, 0.1) !important;
+    border-color: rgba(251, 191, 36, 0.2) !important;
+  }
+  .job-score[data-mobile-tier="low"] {
+    color: #94a3b8 !important; /* slate-400 */
+    background-color: rgba(148, 163, 184, 0.1) !important;
+    border-color: rgba(148, 163, 184, 0.2) !important;
+  }
+
+  /* 6. Botón View Job */
+  .view-job-btn {
+    height: 32px !important;
+    padding: 0 12px !important;
+    border-radius: 8px !important;
+    font-size: 0.75rem !important;
+    background-color: rgba(99, 102, 241, 0.15) !important;
+    color: rgb(129, 140, 248) !important;
+  }
+  
+  .job-card-footer {
+    margin-top: 16px !important;
+    align-items: flex-end !important;
+  }
+  .job-skills {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+}
