@@ -15,6 +15,7 @@ PROFILE = {
 
     "devops": [
         "DevOps",
+        "AWS Devops",
         "Linux",
         "CI/CD",
         "GitLab",
@@ -38,10 +39,13 @@ PROFILE = {
 
     "backend": [
         "Python",
+        "Python (Programming Language)",
         "Node.js",
         "Java",
+        "Java (Programming Language)",
         "PostgreSQL",
-        "REST API"
+        "REST API",
+        "API Integration"
     ],
 
     "observability": [
