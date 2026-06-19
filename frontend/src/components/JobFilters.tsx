@@ -1,5 +1,5 @@
-import React from 'react';
-import { Search, Filter, SlidersHorizontal } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Filter, SlidersHorizontal, ChevronDown } from 'lucide-react';
 
 interface JobFiltersProps {
   search: string;
@@ -17,16 +17,31 @@ export const JobFilters: React.FC<JobFiltersProps> = ({
   minScore, setMinScore,
   companies
 }) => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
-    <div className="bg-slate-800/30 backdrop-blur rounded-2xl p-4 md:p-6 mb-8 border border-slate-700/50">
-      <div className="flex items-center gap-2 mb-4 text-slate-300">
-        <Filter className="w-5 h-5" />
-        <h3 className="font-medium">Filter Vacancies</h3>
+    <div className={`bg-slate-800/30 backdrop-blur rounded-2xl p-4 md:p-6 mb-8 border border-slate-700/50 filters-container ${mobileOpen ? 'is-open' : ''}`}>
+      <div 
+        className="flex items-center justify-between gap-2 mb-4 text-slate-300 cursor-pointer md:cursor-auto"
+        onClick={() => {
+          if (window.innerWidth <= 768) setMobileOpen(!mobileOpen);
+        }}
+      >
+        <div className="flex items-center gap-2">
+          <Filter className="w-5 h-5" />
+          <h3 className="font-medium">Filter Vacancies</h3>
+        </div>
+        <button 
+          className="md:hidden flex items-center gap-1.5 text-sm bg-slate-700/50 hover:bg-slate-700 px-3 py-1.5 rounded-lg transition-colors text-slate-300"
+        >
+          Filtros
+          <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${mobileOpen ? 'rotate-180' : ''}`} />
+        </button>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Search */}
-        <div className="relative">
+        <div className="relative filters-search-wrapper">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Search className="h-4 w-4 text-slate-500" />
           </div>
@@ -40,7 +55,7 @@ export const JobFilters: React.FC<JobFiltersProps> = ({
         </div>
 
         {/* Company Dropdown */}
-        <div className="relative">
+        <div className={`relative ${mobileOpen ? 'block' : 'hidden md:block'}`}>
           <select
             value={company}
             onChange={(e) => setCompany(e.target.value)}
@@ -57,7 +72,7 @@ export const JobFilters: React.FC<JobFiltersProps> = ({
         </div>
 
         {/* Score Filter */}
-        <div className="flex items-center gap-4 bg-slate-900/50 px-4 py-2 border border-slate-700 rounded-xl">
+        <div className={`bg-slate-900/50 px-4 py-2 border border-slate-700 rounded-xl ${mobileOpen ? 'flex items-center gap-4' : 'hidden md:flex items-center gap-4'}`}>
           <label className="text-sm text-slate-400 whitespace-nowrap">Min Score: {minScore}</label>
           <input
             type="range"
