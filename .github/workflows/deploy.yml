@@ -1,7 +1,5 @@
 name: Deploy to Production
 
-# Esto le dice a GitHub que solo ejecute este proceso
-# cuando haya un 'push' o un 'merge' hacia la rama main.
 on:
   push:
     branches:
@@ -9,32 +7,16 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    # Esto es la magia: le dice a GitHub que no use sus servidores,
+    # sino que mande el trabajo a tu Raspberry Pi.
+    runs-on: self-hosted
 
     steps:
-      - name: Conectar por SSH y actualizar contenedores
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          # Las credenciales se toman de los secretos de GitHub
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: 22 # Puerto SSH estándar, cámbialo si usas otro
-          
-          # Estos son los comandos que se ejecutarán en tu servidor
-          script: |
-            # Entramos a la carpeta del proyecto
-            cd ${{ secrets.PROJECT_PATH }}
-            
-            # Traemos los últimos cambios de main
-            git pull origin main
-            
-            # Bajamos los contenedores actuales
-            docker compose down
-            
-            # Limpiamos contenedores viejos y cosas colgadas
-            # (-a limpia imágenes sin usar, -f fuerza sin preguntar, --volumes limpia volúmenes huérfanos)
-            docker system prune -af --volumes
-            
-            # Levantamos todo de nuevo reconstruyendo
-            docker compose up --build -d
+      - name: Actualizar y levantar contenedores
+        # Al estar en tu Raspberry, podemos ejecutar los comandos directamente
+        run: |
+          cd /home/jesus/docker/compose/job-radar
+          git pull origin main
+          docker compose down
+          docker system prune -af --volumes
+          docker compose up --build -d
