@@ -51,7 +51,7 @@ function App() {
         lastUpdated={lastUpdated} 
       />
       
-      <main className="container mx-auto px-4 mt-8 max-w-6xl">
+      <main className="container mx-auto px-4 mt-8 max-w-6xl min-[1600px]:max-w-[1536px]">
         <DashboardStats jobs={jobs} />
         
         <JobFilters 
@@ -71,7 +71,7 @@ function App() {
             <p className="text-sm mt-2">Try adjusting your filters or triggering a refresh.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 min-[1600px]:grid-cols-3 gap-4">
             {jobs.map((job, idx) => (
               <JobCard key={`${job.url}-${idx}`} job={job} />
             ))}

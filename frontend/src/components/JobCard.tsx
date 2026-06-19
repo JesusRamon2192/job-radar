@@ -25,7 +25,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job }) => {
                    job.title.toLowerCase().includes('remoto');
 
   return (
-    <div className="bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 hover:bg-slate-800 transition-all shadow-lg hover:shadow-indigo-500/5 group cursor-pointer job-card" onClick={() => setExpanded(!expanded)}>
+    <div className="bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 lg:p-5 hover:bg-slate-800 transition-all shadow-lg hover:shadow-indigo-500/5 group cursor-pointer job-card" onClick={() => setExpanded(!expanded)}>
       <div className="flex justify-between items-start gap-4 job-card-header">
         <div className="flex-1">
           <h2 className="text-xl font-semibold text-slate-100 group-hover:text-indigo-400 transition-colors line-clamp-2 job-title">
@@ -56,13 +56,26 @@ export const JobCard: React.FC<JobCardProps> = ({ job }) => {
         <div className="flex items-center gap-2 overflow-hidden">
           <Tag className="w-4 h-4 text-slate-500 shrink-0" />
           <div className="flex gap-2 overflow-x-auto no-scrollbar mask-fade-right pb-1 job-skills">
-            {job.skills.slice(0, 5).map((skill, idx) => (
-              <span key={idx} className={`px-2.5 py-1 rounded-full bg-slate-700/50 text-slate-300 text-xs whitespace-nowrap ${idx >= 3 ? 'hidden md:inline-flex' : ''}`}>
-                {skill}
+            {job.skills.slice(0, 5).map((skill, idx) => {
+              let visibilityClass = '';
+              if (idx >= 4) {
+                visibilityClass = 'hidden md:inline-flex lg:hidden';
+              } else if (idx >= 3) {
+                visibilityClass = 'hidden md:inline-flex';
+              }
+              return (
+                <span key={idx} className={`px-2.5 py-1 rounded-full bg-slate-700/50 text-slate-300 text-xs whitespace-nowrap ${visibilityClass}`}>
+                  {skill}
+                </span>
+              );
+            })}
+            {job.skills.length > 4 && (
+              <span className="px-2.5 py-1 rounded-full bg-slate-700/30 text-slate-400 text-xs whitespace-nowrap hidden lg:inline-flex">
+                +{job.skills.length - 4}
               </span>
-            ))}
+            )}
             {job.skills.length > 5 && (
-              <span className="px-2.5 py-1 rounded-full bg-slate-700/30 text-slate-400 text-xs whitespace-nowrap hidden md:inline-flex">
+              <span className="px-2.5 py-1 rounded-full bg-slate-700/30 text-slate-400 text-xs whitespace-nowrap hidden md:inline-flex lg:hidden">
                 +{job.skills.length - 5}
               </span>
             )}
