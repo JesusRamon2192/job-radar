@@ -51,7 +51,7 @@ function App() {
         lastUpdated={lastUpdated} 
       />
       
-      <main className="container mx-auto px-4 mt-8 max-w-6xl min-[1600px]:max-w-[1536px]">
+      <main className="container mx-auto px-4 mt-4 max-w-6xl min-[1600px]:max-w-[1536px]">
         <DashboardStats jobs={jobs} />
         
         <JobFilters 
