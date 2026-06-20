@@ -29,6 +29,7 @@ class JobRepository:
                 existing.score = job_dict["score"]
                 existing.matches = job_dict["matches"]
                 existing.skills = job_dict["skills"]
+                existing.publication_date = job_dict.get("publication_date")
             else:
                 new_job = JobModel(
                     title=job_dict["title"],
@@ -36,7 +37,8 @@ class JobRepository:
                     matches=job_dict["matches"],
                     skills=job_dict["skills"],
                     url=job_dict["url"],
-                    company=job_dict["company"]
+                    company=job_dict["company"],
+                    publication_date=job_dict.get("publication_date")
                 )
                 self.db.add(new_job)
         self.db.commit()
@@ -70,6 +72,8 @@ class JobRepository:
                 "matches": j.matches,
                 "skills": j.skills,
                 "url": j.url,
-                "company": j.company
+                "company": j.company,
+                "publication_date": j.publication_date,
+                "created_at": j.created_at.isoformat() if j.created_at else None
             } for j in jobs
         ]

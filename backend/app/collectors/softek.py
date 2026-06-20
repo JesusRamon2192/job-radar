@@ -1,4 +1,5 @@
 import requests
+from datetime import datetime
 
 from app.collectors.base import BaseCollector
 
@@ -40,7 +41,8 @@ class SoftekCollector(BaseCollector):
                             "name": position.get("name"),
                             "company": "Softtek",
                             "url": f"https://jobs.softtek.com{position.get('positionUrl', '')}",
-                            "skills": raw_skills
+                            "skills": raw_skills,
+                            "publication_date": datetime.fromtimestamp(position.get("creationTs", 0)).isoformat() if position.get("creationTs") else None
                         }
                         jobs.append(job)
                 

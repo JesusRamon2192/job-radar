@@ -24,6 +24,7 @@ class EpamCollector(BaseCollector):
         jobs = response.json()["data"]["jobs"]
         for job in jobs:
             job["company"] = "EPAM"
+            job["publication_date"] = job.get("created_at")
         return jobs
 
 if __name__ == "__main__":
