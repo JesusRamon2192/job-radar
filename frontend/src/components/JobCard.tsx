@@ -24,8 +24,9 @@ export const JobCard: React.FC<JobCardProps> = ({ job }) => {
     return 'low';
   };
 
-  const isRemote = job.title.toLowerCase().includes('remote') || 
-                   job.title.toLowerCase().includes('remoto');
+  const modality = job.modality && job.modality !== "Unknown" 
+    ? job.modality 
+    : (job.title.toLowerCase().includes('remote') || job.title.toLowerCase().includes('remoto') ? 'Remote' : null);
 
   const scoreInfo = getScoreClassification(job.score);
 
@@ -42,10 +43,10 @@ export const JobCard: React.FC<JobCardProps> = ({ job }) => {
               <Building className="w-4 h-4 shrink-0" />
               {job.company}
             </div>
-            {isRemote && (
+            {modality && (
               <div className="flex items-center gap-1.5 text-indigo-300">
                 <MapPin className="w-4 h-4 shrink-0" />
-                Remote
+                {modality}
               </div>
             )}
             {job.publication_date && (

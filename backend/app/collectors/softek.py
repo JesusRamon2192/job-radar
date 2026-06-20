@@ -28,8 +28,7 @@ class SoftekCollector(BaseCollector):
                     work_location = position.get("workLocationOption", "").lower()
                     # La API actualmente está devolviendo 'hybrid' en lugar de 'remote' para esta búsqueda,
                     # por lo que aceptamos ambos para que no devuelva 0 vacantes.
-                    if "remote" in work_location:
-                    #if "remote" in work_location or "hybrid" in work_location:
+                    if "remote" in work_location or "hybrid" in work_location:
                         
                         # Extraer palabras del título como 'skills' ya que Softtek no las provee en este endpoint
                         raw_skills = position.get("skills", [])
@@ -37,11 +36,14 @@ class SoftekCollector(BaseCollector):
                             title_words = position.get("name", "").replace("/", " ").replace("-", " ").split()
                             raw_skills = [w for w in title_words if len(w) > 2]
 
+                        modality = "Hybrid" if "hybrid" in work_location else "Remote" if "remote" in work_location else "Unknown"
+
                         job = {
                             "name": position.get("name"),
                             "company": "Softtek",
                             "url": f"https://jobs.softtek.com{position.get('positionUrl', '')}",
                             "skills": raw_skills,
+                            "modality": modality,
                             "publication_date": datetime.fromtimestamp(position.get("creationTs", 0)).isoformat() if position.get("creationTs") else None
                         }
                         jobs.append(job)

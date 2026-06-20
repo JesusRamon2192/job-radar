@@ -45,13 +45,15 @@ class AccentureCollector(BaseCollector):
             
             for job in page_jobs:
                 # Filtrar solo por trabajos remotos o híbridos
-                if job.get("remoteType") not in ["Remote", "Hybrid Eligible"]:
+                remote_type = job.get("remoteType")
+                if remote_type not in ["Remote", "Hybrid Eligible"]:
                     continue
                 
                 # Estandarizando el diccionario para el proyecto Job Radar
                 job["company"] = "Accenture"
                 job["name"] = job.get("title", "")
                 job["publication_date"] = job.get("updateDate")
+                job["modality"] = remote_type
                 
                 # Accenture devuelve URL parcial a veces o completa. Asegurar que este bien formada.
                 raw_url = job.get("jobDetailUrl", "")

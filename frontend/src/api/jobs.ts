@@ -10,6 +10,7 @@ export interface Job {
   url: string;
   company: string;
   publication_date?: string;
+  modality?: string;
   created_at?: string;
 }
 
