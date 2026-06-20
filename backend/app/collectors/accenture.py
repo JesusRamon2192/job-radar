@@ -51,6 +51,7 @@ class AccentureCollector(BaseCollector):
                 # Estandarizando el diccionario para el proyecto Job Radar
                 job["company"] = "Accenture"
                 job["name"] = job.get("title", "")
+                job["publication_date"] = job.get("updateDate")
                 
                 # Accenture devuelve URL parcial a veces o completa. Asegurar que este bien formada.
                 raw_url = job.get("jobDetailUrl", "")

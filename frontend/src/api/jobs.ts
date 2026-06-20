@@ -9,6 +9,8 @@ export interface Job {
   skills: string[];
   url: string;
   company: string;
+  publication_date?: string;
+  created_at?: string;
 }
 
 export interface JobsResponse {

@@ -33,7 +33,8 @@ def run_profile_match():
             "matches": result["matches"],
             "skills": job.get("skills", []),
             "url": full_url,
-            "company": job.get("company", "Desconocida")
+            "company": job.get("company", "Desconocida"),
+            "publication_date": job.get("publication_date")
         })
 
     # Ordenar por score por defecto
