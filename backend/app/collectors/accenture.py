@@ -49,7 +49,7 @@ class AccentureCollector(BaseCollector):
                 if remote_type not in ["Remote", "Hybrid Eligible"]:
                     continue
                 
-                # Estandarizando el diccionario para el proyecto Job Radar
+                # Estandarizando el diccionario para el proyecto DevRadar
                 job["company"] = "Accenture"
                 job["name"] = job.get("title", "")
                 job["publication_date"] = job.get("updateDate")
