@@ -12,4 +12,5 @@ class JobModel(Base):
     skills = Column(JSON)
     url = Column(String)
     company = Column(String, index=True)
+    publication_date = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ExternalLink, Building, MapPin, Tag } from 'lucide-react';
+import { ExternalLink, Building, MapPin, Tag, Calendar, Clock } from 'lucide-react';
 import type { Job } from '../api/jobs';
 
 interface JobCardProps {
@@ -41,6 +41,18 @@ export const JobCard: React.FC<JobCardProps> = ({ job }) => {
               <div className="flex items-center gap-1.5 text-indigo-300">
                 <MapPin className="w-4 h-4 shrink-0" />
                 Remote
+              </div>
+            )}
+            {job.publication_date && (
+              <div className="flex items-center gap-1.5 text-slate-400" title="Fecha de Publicación">
+                <Calendar className="w-4 h-4 shrink-0" />
+                Publicada: {new Date(job.publication_date).toLocaleDateString()}
+              </div>
+            )}
+            {job.created_at && (
+              <div className="flex items-center gap-1.5 text-slate-400" title="Fecha Descubierta por Radar">
+                <Clock className="w-4 h-4 shrink-0" />
+                Descubierta: {new Date(job.created_at).toLocaleDateString()}
               </div>
             )}
           </div>
