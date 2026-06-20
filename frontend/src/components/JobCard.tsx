@@ -9,20 +9,25 @@ interface JobCardProps {
 export const JobCard: React.FC<JobCardProps> = ({ job }) => {
   const [expanded, setExpanded] = useState(false);
 
-  const getScoreColor = (score: number) => {
-    if (score >= 50) return 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20';
-    if (score >= 30) return 'text-amber-400 bg-amber-400/10 border-amber-400/20';
-    return 'text-rose-400 bg-rose-400/10 border-rose-400/20';
+  const getScoreClassification = (score: number) => {
+    if (score >= 80) return { colorClass: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20', stars: '★★★★★', label: 'Excelente' };
+    if (score >= 60) return { colorClass: 'text-blue-400 bg-blue-400/10 border-blue-400/20', stars: '★★★★☆', label: 'Buena' };
+    if (score >= 40) return { colorClass: 'text-amber-400 bg-amber-400/10 border-amber-400/20', stars: '★★★☆☆', label: 'Regular' };
+    if (score >= 20) return { colorClass: 'text-slate-400 bg-slate-400/10 border-slate-400/20', stars: '★★☆☆☆', label: 'Baja' };
+    return { colorClass: 'text-slate-400 bg-slate-400/10 border-slate-400/20', stars: '★☆☆☆☆', label: 'Baja' };
   };
 
   const getScoreTierMobile = (score: number) => {
-    if (score >= 70) return 'high';
-    if (score >= 50) return 'medium';
+    if (score >= 80) return 'excellent';
+    if (score >= 60) return 'good';
+    if (score >= 40) return 'regular';
     return 'low';
   };
 
   const isRemote = job.title.toLowerCase().includes('remote') || 
                    job.title.toLowerCase().includes('remoto');
+
+  const scoreInfo = getScoreClassification(job.score);
 
   return (
     <div className="bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 lg:p-5 hover:bg-slate-800 transition-all shadow-lg hover:shadow-indigo-500/5 group cursor-pointer job-card" onClick={() => setExpanded(!expanded)}>
@@ -58,9 +63,16 @@ export const JobCard: React.FC<JobCardProps> = ({ job }) => {
           </div>
         </div>
 
-        <div className={`flex flex-col items-center justify-center min-w-[60px] h-[60px] rounded-xl border ${getScoreColor(job.score)} job-score`} data-mobile-tier={getScoreTierMobile(job.score)}>
-          <span className="text-xs font-medium uppercase opacity-70 score-label">Score</span>
-          <span className="text-xl font-bold leading-tight score-value">{job.score}</span>
+        <div 
+          className={`flex flex-col items-center justify-center px-3 py-2 rounded-xl border ${scoreInfo.colorClass} job-score shrink-0 transition-colors`} 
+          data-mobile-tier={getScoreTierMobile(job.score)}
+          title={`${scoreInfo.label} coincidencia`}
+        >
+          <div className="flex items-baseline gap-1">
+            <span className="text-xl font-bold leading-none score-value">{job.score}%</span>
+            <span className="text-xs font-medium uppercase opacity-80 score-label">Match</span>
+          </div>
+          <span className="text-[10px] tracking-widest mt-1 opacity-90 score-stars">{scoreInfo.stars}</span>
         </div>
       </div>
 
