@@ -64,15 +64,11 @@ export const JobCard: React.FC<JobCardProps> = ({ job }) => {
         </div>
 
         <div 
-          className={`flex flex-col items-center justify-center px-3 py-2 rounded-xl border ${scoreInfo.colorClass} job-score shrink-0 transition-colors`} 
+          className={`flex items-center justify-center px-4 py-2.5 rounded-xl border ${scoreInfo.colorClass} job-score shrink-0 transition-colors`} 
           data-mobile-tier={getScoreTierMobile(job.score)}
-          title={`${scoreInfo.label} coincidencia`}
+          title={`${scoreInfo.label} coincidencia: ${job.score}%`}
         >
-          <div className="flex items-baseline gap-1">
-            <span className="text-xl font-bold leading-none score-value">{job.score}%</span>
-            <span className="text-xs font-medium uppercase opacity-80 score-label">Match</span>
-          </div>
-          <span className="text-[10px] tracking-widest mt-1 opacity-90 score-stars">{scoreInfo.stars}</span>
+          <span className="text-sm tracking-[0.15em] opacity-90 score-stars">{scoreInfo.stars}</span>
         </div>
       </div>
 
