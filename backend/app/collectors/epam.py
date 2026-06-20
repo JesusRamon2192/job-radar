@@ -25,6 +25,15 @@ class EpamCollector(BaseCollector):
         for job in jobs:
             job["company"] = "EPAM"
             job["publication_date"] = job.get("created_at")
+            
+            # Extraer modalidad de trabajo
+            modality = "Unknown"
+            metadata = job.get("metadata", {})
+            vacancy_types = metadata.get("vacancy_type", [])
+            if vacancy_types and isinstance(vacancy_types, list):
+                modality = vacancy_types[0].get("title", "Unknown")
+            job["modality"] = modality
+            
         return jobs
 
 if __name__ == "__main__":

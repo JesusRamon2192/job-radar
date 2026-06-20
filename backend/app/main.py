@@ -11,7 +11,7 @@ from app.database.db import get_db, engine, Base, SessionLocal
 from app.repositories.job_repository import JobRepository
 from app.models.job import JobModel
 
-app = FastAPI(title="Job Radar API")
+app = FastAPI(title="DevRadar API")
 
 scheduler = BackgroundScheduler()
 

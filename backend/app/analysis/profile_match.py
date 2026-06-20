@@ -37,7 +37,8 @@ for job in jobs:
         "matches": result["matches"],
         "skills": job.get("skills", []),
         "url": full_url,
-        "company": job.get("company", "Desconocida")
+        "company": job.get("company", "Desconocida"),
+        "modality": job.get("modality", "Unknown")
     })
 
 results.sort(
@@ -64,6 +65,7 @@ for company, company_jobs in jobs_by_company.items():
         print(f"Score  : {job['score']}")
         print(f"URL    : {job['url']}")
         print(f"Compañia : {job['company']}")
+        print(f"Modalidad: {job['modality']}")
 
         print("\nMatches:")
 

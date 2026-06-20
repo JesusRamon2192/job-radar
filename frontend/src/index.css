@@ -22,27 +22,27 @@
 */
 @media (max-width: 768px) {
   /* 1. Header */
-  .job-radar-header .header-content {
+  .dev-radar-header .header-content {
     height: 56px !important;
   }
-  .job-radar-header .logo-icon {
+  .dev-radar-header .logo-icon {
     padding: 6px !important;
   }
-  .job-radar-header .logo-icon svg {
+  .dev-radar-header .logo-icon svg {
     width: 20px !important;
     height: 20px !important;
   }
-  .job-radar-header .logo-text {
+  .dev-radar-header .logo-text {
     font-size: 1.125rem !important; /* text-lg */
   }
-  .job-radar-header .refresh-btn {
+  .dev-radar-header .refresh-btn {
     padding: 8px !important;
     border-radius: 50% !important;
     width: 36px !important;
     height: 36px !important;
     justify-content: center !important;
   }
-  .job-radar-header .refresh-btn .refresh-text {
+  .dev-radar-header .refresh-btn .refresh-text {
     display: none !important;
   }
 

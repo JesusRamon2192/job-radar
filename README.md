@@ -1,6 +1,6 @@
-# Job Radar Web Application
+# DevRadar Web Application
 
-Aplicación web Full Stack para analizar y puntuar vacantes de trabajo (Job Radar), ahora con interfaz de usuario moderna y Dockerizada.
+Aplicación web Full Stack para analizar y puntuar vacantes de trabajo (DevRadar), ahora con interfaz de usuario moderna y Dockerizada.
 
 ## Arquitectura
 

@@ -16,6 +16,7 @@ function App() {
   const [search, setSearch] = useState('');
   const [company, setCompany] = useState('');
   const [minScore, setMinScore] = useState<number>(0);
+  const [sortBy, setSortBy] = useState<'score' | 'date' | 'title'>('score');
 
   const loadJobs = async () => {
     try {
@@ -45,13 +46,24 @@ function App() {
   // We'll just derive it from current jobs, though ideally it should come from the API
   const companies = Array.from(new Set(jobs.map(j => j.company)));
 
+  const sortedJobs = [...jobs].sort((a, b) => {
+    if (sortBy === 'score') return b.score - a.score;
+    if (sortBy === 'title') return a.title.localeCompare(b.title);
+    if (sortBy === 'date') {
+      const dateA = a.publication_date ? new Date(a.publication_date).getTime() : 0;
+      const dateB = b.publication_date ? new Date(b.publication_date).getTime() : 0;
+      return dateB - dateA;
+    }
+    return 0;
+  });
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-indigo-500/30 pb-20">
       <Header 
         lastUpdated={lastUpdated} 
       />
       
-      <main className="container mx-auto px-4 mt-8 max-w-6xl min-[1600px]:max-w-[1536px]">
+      <main className="container mx-auto px-4 mt-4 max-w-6xl min-[1600px]:max-w-[1536px]">
         <DashboardStats jobs={jobs} />
         
         <JobFilters 
@@ -59,20 +71,21 @@ function App() {
           company={company} setCompany={setCompany}
           minScore={minScore} setMinScore={setMinScore}
           companies={companies}
+          sortBy={sortBy} setSortBy={setSortBy}
         />
 
         {loading && jobs.length === 0 ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
           </div>
-        ) : jobs.length === 0 ? (
+        ) : sortedJobs.length === 0 ? (
           <div className="text-center py-20 text-slate-400 bg-slate-800/30 rounded-2xl border border-slate-700/50">
             <p className="text-lg">No jobs found matching your criteria.</p>
             <p className="text-sm mt-2">Try adjusting your filters or triggering a refresh.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 min-[1600px]:grid-cols-3 gap-4 items-start">
-            {jobs.map((job, idx) => (
+            {sortedJobs.map((job, idx) => (
               <JobCard key={`${job.url}-${idx}`} job={job} />
             ))}
           </div>
