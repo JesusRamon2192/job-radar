@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import cast, String, or_, func
 from app.models.job import JobModel
 from datetime import datetime
 
@@ -45,7 +46,7 @@ class JobRepository:
                 self.db.add(new_job)
         self.db.commit()
 
-    def get_all_jobs(self, company=None, min_score=None, search=None, limit=None):
+    def get_all_jobs(self, company=None, min_score=None, search=None, modalities=None, skills=None, limit=None):
         query = self.db.query(JobModel)
         
         if company:
@@ -59,6 +60,15 @@ class JobRepository:
             # In Postgres, JSON string comparison might need special handling, but we can search in title.
             # For simplicity, we search in title. 
             query = query.filter(JobModel.title.ilike(search_term))
+            
+        if modalities:
+            mod_list = [m.strip().lower() for m in modalities.split(',')]
+            query = query.filter(func.lower(JobModel.modality).in_(mod_list))
+
+        if skills:
+            skill_list = [s.strip() for s in skills.split(',')]
+            conditions = [cast(JobModel.skills, String).ilike(f'%"{skill}"%') for skill in skill_list]
+            query = query.filter(or_(*conditions))
             
         query = query.order_by(JobModel.score.desc())
         

@@ -80,10 +80,18 @@ def get_jobs(
     company: Optional[str] = None,
     min_score: Optional[int] = None,
     search: Optional[str] = None,
+    modalities: Optional[str] = None,
+    skills: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
     repo = JobRepository(db)
-    jobs = repo.get_all_jobs(company=company, min_score=min_score, search=search)
+    jobs = repo.get_all_jobs(
+        company=company, 
+        min_score=min_score, 
+        search=search,
+        modalities=modalities,
+        skills=skills
+    )
         
     return {
         "jobs": jobs,
