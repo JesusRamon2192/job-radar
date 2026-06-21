@@ -92,7 +92,8 @@ class IbmCollector(BaseCollector):
                 elif "hybrid" in modality_lower:
                     job_info["modality"] = "Hybrid"
                 else:
-                    job_info["modality"] = "On-site"
+                    # Skip on-site or unspecified modalities
+                    continue
                     
                 job_info["url"] = source.get("url", "")
                 
@@ -121,7 +122,13 @@ class IbmCollector(BaseCollector):
                 
             from_param += size_param
             
-        return jobs
+        # Prioritize Remote over Hybrid
+        jobs.sort(key=lambda x: 0 if x.get("modality") == "Remote" else 1)
+        
+        # Limit to 150 total after prioritizing
+        final_jobs = jobs[:150]
+        logging.info(f"Extracción finalizada. Retornando {len(final_jobs)} vacantes (Priorizando Remotas).")
+        return final_jobs
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
