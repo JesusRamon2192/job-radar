@@ -21,11 +21,19 @@ export interface JobsResponse {
   is_refreshing: boolean;
 }
 
-export const fetchJobs = async (company?: string, minScore?: number, search?: string): Promise<JobsResponse> => {
+export const fetchJobs = async (
+  company?: string, 
+  minScore?: number, 
+  search?: string,
+  modalities?: string[],
+  skills?: string[]
+): Promise<JobsResponse> => {
   const params = new URLSearchParams();
   if (company) params.append('company', company);
   if (minScore !== undefined) params.append('min_score', minScore.toString());
   if (search) params.append('search', search);
+  if (modalities && modalities.length > 0) params.append('modalities', modalities.join(','));
+  if (skills && skills.length > 0) params.append('skills', skills.join(','));
 
   const response = await axios.get(`${API_URL}/jobs`, { params });
   return response.data;

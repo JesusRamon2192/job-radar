@@ -17,14 +17,26 @@ function App() {
   const [company, setCompany] = useState('');
   const [minScore, setMinScore] = useState<number>(0);
   const [sortBy, setSortBy] = useState<'score' | 'date' | 'title'>('score');
+  const [modalities, setModalities] = useState<string[]>([]);
+  const [skills, setSkills] = useState<string[]>([]);
+
+  // Available options
+  const [availableCompanies, setAvailableCompanies] = useState<string[]>([]);
+  const [availableModalities, setAvailableModalities] = useState<string[]>([]);
+  const [availableSkills, setAvailableSkills] = useState<string[]>([]);
 
   const loadJobs = async () => {
     try {
       setLoading(true);
-      const data = await fetchJobs(company || undefined, minScore, search || undefined);
+      const data = await fetchJobs(company || undefined, minScore, search || undefined, modalities, skills);
       setJobs(data.jobs);
       setLastUpdated(data.last_updated);
       setIsRefreshing(data.is_refreshing);
+
+      // Aggregate available options
+      setAvailableCompanies(prev => Array.from(new Set([...prev, ...data.jobs.map(j => j.company)])));
+      setAvailableModalities(prev => Array.from(new Set([...prev, ...(data.jobs.map(j => j.modality).filter(Boolean) as string[])])));
+      setAvailableSkills(prev => Array.from(new Set([...prev, ...data.jobs.flatMap(j => j.skills || [])])).sort());
     } catch (error) {
       console.error("Failed to load jobs", error);
     } finally {
@@ -40,11 +52,7 @@ function App() {
       interval = window.setInterval(loadJobs, 5000);
     }
     return () => clearInterval(interval);
-  }, [isRefreshing, company, minScore, search]);
-
-  // Get unique companies from the full dataset for the dropdown
-  // We'll just derive it from current jobs, though ideally it should come from the API
-  const companies = Array.from(new Set(jobs.map(j => j.company)));
+  }, [isRefreshing, company, minScore, search, modalities, skills]);
 
   const sortedJobs = [...jobs].sort((a, b) => {
     if (sortBy === 'score') return b.score - a.score;
@@ -70,8 +78,12 @@ function App() {
           search={search} setSearch={setSearch}
           company={company} setCompany={setCompany}
           minScore={minScore} setMinScore={setMinScore}
-          companies={companies}
+          companies={availableCompanies}
           sortBy={sortBy} setSortBy={setSortBy}
+          modalities={modalities} setModalities={setModalities}
+          availableModalities={availableModalities}
+          skills={skills} setSkills={setSkills}
+          availableSkills={availableSkills}
         />
 
         {loading && jobs.length === 0 ? (
