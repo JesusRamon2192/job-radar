@@ -174,3 +174,4 @@ cython_debug/
 *.crt
 comandos.txt
 scratch/*
+refresh.sh
