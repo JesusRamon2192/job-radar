@@ -30,7 +30,7 @@ export const JobFilters: React.FC<JobFiltersProps> = ({
   skills, setSkills,
   availableSkills
 }) => {
-  const [openDropdown, setOpenDropdown] = useState<'modalities' | 'skills' | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<'modalities' | 'skills' | 'company' | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -93,23 +93,47 @@ export const JobFilters: React.FC<JobFiltersProps> = ({
           </div>
 
           {/* Company Dropdown */}
-          <div className="relative w-full md:w-56 group">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500 group-focus-within:text-indigo-400 transition-colors">
-              <Building2 className="h-4 w-4" />
-            </div>
-            <select
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
-              className="block w-full pl-9 pr-10 py-2.5 border-none rounded-xl bg-slate-900/40 hover:bg-slate-900/60 text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-sm appearance-none cursor-pointer"
+          <div className="relative w-full md:w-56">
+            <button
+              onClick={() => setOpenDropdown(openDropdown === 'company' ? null : 'company')}
+              className={`w-full flex items-center justify-between pl-3 pr-4 py-2.5 rounded-xl bg-slate-900/40 hover:bg-slate-900/60 transition-all text-sm border focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${openDropdown === 'company' ? 'border-indigo-500/50 text-indigo-300' : 'border-transparent text-slate-300'}`}
             >
-              <option value="">Todas las Compañías</option>
-              {companies.map(c => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              <SlidersHorizontal className="h-4 w-4 text-slate-500" />
-            </div>
+              <div className="flex items-center gap-2 truncate">
+                <Building2 className={`h-4 w-4 shrink-0 ${company ? 'text-indigo-400' : 'text-slate-500'}`} />
+                <span className="truncate">
+                  {company || 'Todas las Compañías'}
+                </span>
+              </div>
+              <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${openDropdown === 'company' ? 'rotate-180 text-indigo-400' : 'text-slate-500'}`} />
+            </button>
+
+            {openDropdown === 'company' && (
+              <div className="absolute top-full left-0 mt-2 w-full min-w-[240px] bg-slate-800 border border-slate-700/50 rounded-xl shadow-2xl z-50 py-2 backdrop-blur-xl">
+                <div className="max-h-60 overflow-y-auto custom-scrollbar px-2 grid grid-cols-1 gap-1">
+                  <label 
+                    onClick={(e) => { e.preventDefault(); setCompany(''); setOpenDropdown(null); }}
+                    className="flex items-center gap-3 px-3 py-2 hover:bg-slate-700/50 rounded-lg cursor-pointer transition-colors group"
+                  >
+                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors shrink-0 ${!company ? 'border-indigo-500 bg-indigo-500' : 'border-slate-500 bg-slate-900/50 group-hover:border-indigo-400'}`}>
+                      {!company && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                    </div>
+                    <span className={`text-sm group-hover:text-slate-100 ${!company ? 'text-slate-200 font-medium' : 'text-slate-300'}`}>Todas las Compañías</span>
+                  </label>
+                  {companies.map(c => (
+                    <label 
+                      key={c} 
+                      onClick={(e) => { e.preventDefault(); setCompany(c); setOpenDropdown(null); }}
+                      className="flex items-center gap-3 px-3 py-2 hover:bg-slate-700/50 rounded-lg cursor-pointer transition-colors group"
+                    >
+                      <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors shrink-0 ${company === c ? 'border-indigo-500 bg-indigo-500' : 'border-slate-500 bg-slate-900/50 group-hover:border-indigo-400'}`}>
+                        {company === c && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      </div>
+                      <span className={`text-sm truncate group-hover:text-slate-100 ${company === c ? 'text-slate-200 font-medium' : 'text-slate-300'}`}>{c}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Modalities Multi-Select */}
