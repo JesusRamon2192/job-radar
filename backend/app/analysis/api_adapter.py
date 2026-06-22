@@ -3,6 +3,7 @@ from app.collectors.softek import SoftekCollector
 from app.collectors.accenture import AccentureCollector
 from app.collectors.globant import GlobantCollector
 from app.collectors.ibm import IbmCollector
+from app.collectors.greenhouse import GreenhouseCollector
 from app.services.matcher_service import MatcherService
 from datetime import datetime
 
@@ -12,6 +13,7 @@ def run_profile_match():
     accenture_collector = AccentureCollector()
     globant_collector = GlobantCollector()
     ibm_collector = IbmCollector()
+    greenhouse_collector = GreenhouseCollector()
     matcher = MatcherService()
 
     epam_jobs = epam_collector.collect()
@@ -19,18 +21,19 @@ def run_profile_match():
     accenture_jobs = accenture_collector.collect()
     globant_jobs = globant_collector.collect()
     ibm_jobs = ibm_collector.collect()
+    greenhouse_jobs = greenhouse_collector.collect()
 
-    jobs = epam_jobs + softek_jobs + accenture_jobs + globant_jobs + ibm_jobs
+    jobs = epam_jobs + softek_jobs + accenture_jobs + globant_jobs + ibm_jobs + greenhouse_jobs
     results = []
 
     for job in jobs:
         result = matcher.score(job)
 
-        seo = job.get("seo") or {}
-        url_path = seo.get("url", "")
-        full_url = f"https://careers.epam.com{url_path}" if url_path else "N/A"
-        
-        if job.get("company") in ["Softtek", "Accenture", "Globant", "IBM"]:
+        if job.get("company") == "EPAM":
+            seo = job.get("seo") or {}
+            url_path = seo.get("url", "")
+            full_url = f"https://careers.epam.com{url_path}" if url_path else "N/A"
+        else:
             full_url = job.get("url", "N/A")
 
         results.append({
