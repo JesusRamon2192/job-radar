@@ -14,10 +14,10 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated }) => {
             <Radar className="w-6 h-6" />
           </div>
           <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent logo-text">
-            DevRadar
+            DevLATAM
           </h1>
         </div>
-        
+
         <div className="flex items-center gap-6">
           {lastUpdated && (
             <div className="text-xs text-slate-400 hidden sm:block">
