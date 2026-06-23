@@ -34,7 +34,10 @@ export const JobCard: React.FC<JobCardProps> = ({ job }) => {
     const date = new Date(dateStr);
     const now = new Date();
     const diffTime = now.getTime() - date.getTime();
-    const diffDays = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+    
+    const dateCalendar = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const nowCalendar = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diffDays = Math.max(0, Math.floor((nowCalendar.getTime() - dateCalendar.getTime()) / (1000 * 60 * 60 * 24)));
     
     const isNew = diffTime < 72 * 60 * 60 * 1000;
     

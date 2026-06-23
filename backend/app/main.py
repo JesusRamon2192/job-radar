@@ -5,7 +5,7 @@ from typing import List, Optional
 from datetime import datetime
 import asyncio
 from apscheduler.schedulers.background import BackgroundScheduler
-
+from zoneinfo import ZoneInfo
 from app.analysis.api_adapter import run_profile_match
 from app.database.db import get_db, engine, Base, SessionLocal
 from app.repositories.job_repository import JobRepository
@@ -52,7 +52,13 @@ async def startup_event():
     Base.metadata.create_all(bind=engine)
     
     # Schedule daily job
-    scheduler.add_job(refresh_jobs_task, 'cron', hour=0, minute=0)
+    scheduler.add_job(
+        refresh_jobs_task, 
+        'cron', 
+        hour=0, 
+        minute=0, 
+        timezone=ZoneInfo("America/Mexico_City")
+    )
     scheduler.start()
     
     # Trigger an initial fetch if DB is empty
