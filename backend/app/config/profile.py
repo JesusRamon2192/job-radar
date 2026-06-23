@@ -54,5 +54,15 @@ PROFILE = {
         "Prometheus",
         "Monitoring",
         "Observability"
+    ],
+
+    "frontend": [
+        "JavaScript",
+        "HTML",
+        "CSS",
+        "React",
+        "TypeScript",
+        "Tailwind CSS",
+        "Frontend Development"
     ]
 }

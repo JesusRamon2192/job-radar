@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Cloud, Box, Server, Cpu, Code2, Activity } from 'lucide-react';
+import { ArrowLeft, Cloud, Box, Server, Cpu, Code2, Activity, Layout } from 'lucide-react';
 
 interface ScoreAnalysisProps {
   onBack: () => void;
@@ -53,6 +53,14 @@ const CATEGORIES = [
     score: 75,
     color: 'from-yellow-400 to-orange-500',
     skills: ["New Relic", "Grafana", "Prometheus", "Monitoring", "Observability"]
+  },
+  {
+    id: 'frontend',
+    name: 'Frontend Development',
+    icon: Layout,
+    score: 82,
+    color: 'from-pink-500 to-rose-400',
+    skills: ["JavaScript", "HTML", "CSS", "React", "TypeScript", "Tailwind CSS", "Frontend Development"]
   }
 ];
 
