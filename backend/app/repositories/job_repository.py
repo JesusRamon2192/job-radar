@@ -29,6 +29,7 @@ class JobRepository:
             if existing:
                 existing.score = job_dict["score"]
                 existing.matches = job_dict["matches"]
+                existing.category_breakdown = job_dict.get("category_breakdown", {})
                 existing.skills = job_dict["skills"]
                 # Opción A: Protegemos la fecha de publicación original. 
                 # Solo la asignamos si estaba vacía previamente.
@@ -40,6 +41,7 @@ class JobRepository:
                     title=job_dict["title"],
                     score=job_dict["score"],
                     matches=job_dict["matches"],
+                    category_breakdown=job_dict.get("category_breakdown", {}),
                     skills=job_dict["skills"],
                     url=job_dict["url"],
                     company=job_dict["company"],
@@ -85,6 +87,7 @@ class JobRepository:
                 "title": j.title,
                 "score": j.score,
                 "matches": j.matches,
+                "category_breakdown": j.category_breakdown,
                 "skills": j.skills,
                 "url": j.url,
                 "company": j.company,

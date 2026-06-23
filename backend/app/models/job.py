@@ -9,6 +9,7 @@ class JobModel(Base):
     title = Column(String, index=True)
     score = Column(Integer)
     matches = Column(JSON)
+    category_breakdown = Column(JSON, nullable=True)
     skills = Column(JSON)
     url = Column(String)
     company = Column(String, index=True)

@@ -137,7 +137,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job }) => {
         <div 
           className={`flex items-center justify-center px-4 py-2.5 rounded-xl border ${scoreInfo.colorClass} job-score shrink-0 transition-colors`} 
           data-mobile-tier={getScoreTierMobile(job.score)}
-          title={`${scoreInfo.label} coincidencia: ${job.score}%`}
+          title={`${scoreInfo.label} coincidencia: ${job.score} pts`}
         >
           <span className="text-sm tracking-[0.15em] opacity-90 score-stars">{scoreInfo.stars}</span>
         </div>
