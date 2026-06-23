@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ExternalLink, Building, MapPin, Tag, Calendar, Clock } from 'lucide-react';
+import { ExternalLink, Building, MapPin, Tag, Calendar, Search } from 'lucide-react';
 import type { Job } from '../api/jobs';
 
 interface JobCardProps {
@@ -30,6 +30,49 @@ export const JobCard: React.FC<JobCardProps> = ({ job }) => {
 
   const scoreInfo = getScoreClassification(job.score);
 
+  const getRelativeDateInfo = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffTime = now.getTime() - date.getTime();
+    const diffDays = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+    
+    const isNew = diffTime < 72 * 60 * 60 * 1000;
+    
+    let relative = '';
+    if (diffDays === 0) {
+      relative = 'hoy';
+    } else if (diffDays === 1) {
+      relative = 'hace 1 día';
+    } else if (diffDays < 7) {
+      relative = `hace ${diffDays} días`;
+    } else if (diffDays === 7) {
+      relative = 'hace 1 semana';
+    } else {
+      const weeks = Math.floor(diffDays / 7);
+      if (weeks < 4) {
+        relative = `hace ${weeks} semanas`;
+      } else {
+        const months = Math.floor(diffDays / 30);
+        if (months <= 1) {
+          relative = 'hace 1 mes';
+        } else {
+          relative = `hace ${months} meses`;
+        }
+      }
+    }
+    
+    return { relative, isNew };
+  };
+
+  const formatDateShort = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const day = date.getDate();
+    const month = date.toLocaleDateString('es-ES', { month: 'short' }).replace('.', '');
+    const capitalizedMonth = month.charAt(0).toUpperCase() + month.slice(1);
+    const year = date.getFullYear();
+    return `${day} ${capitalizedMonth} ${year}`;
+  };
+
   return (
     <div className="bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 lg:p-5 hover:bg-slate-800 transition-all shadow-lg hover:shadow-indigo-500/5 group cursor-pointer job-card" onClick={() => setExpanded(!expanded)}>
       <div className="flex justify-between items-start gap-4 job-card-header">
@@ -38,27 +81,51 @@ export const JobCard: React.FC<JobCardProps> = ({ job }) => {
             {job.title}
           </h2>
           
-          <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-400 job-metadata">
-            <div className="flex items-center gap-1.5">
-              <Building className="w-4 h-4 shrink-0" />
-              {job.company}
+          <div className="mt-3 flex flex-col gap-2 text-sm text-slate-400 job-metadata">
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-1.5">
+                <Building className="w-4 h-4 shrink-0" />
+                {job.company}
+              </div>
+              {modality && (
+                <div className="flex items-center gap-1.5 text-indigo-300">
+                  <MapPin className="w-4 h-4 shrink-0" />
+                  {modality}
+                </div>
+              )}
             </div>
-            {modality && (
-              <div className="flex items-center gap-1.5 text-indigo-300">
-                <MapPin className="w-4 h-4 shrink-0" />
-                {modality}
-              </div>
-            )}
-            {job.publication_date && (
-              <div className="flex items-center gap-1.5 text-slate-400" title="Fecha de Publicación">
-                <Calendar className="w-4 h-4 shrink-0" />
-                Publicada: {new Date(job.publication_date).toLocaleDateString()}
-              </div>
-            )}
-            {job.created_at && (
-              <div className="flex items-center gap-1.5 text-slate-400" title="Fecha Descubierta por Radar">
-                <Clock className="w-4 h-4 shrink-0" />
-                Descubierta: {new Date(job.created_at).toLocaleDateString()}
+            
+            {(job.publication_date || job.created_at) && (
+              <div className="flex flex-col gap-1.5">
+                {job.publication_date && (() => {
+                  const pubDateInfo = getRelativeDateInfo(job.publication_date);
+                  return (
+                    <div className="flex items-center gap-1.5 text-slate-400" title="Fecha de Publicación">
+                      <Calendar className="w-4 h-4 shrink-0" />
+                      <span>
+                        Publicada <span className="font-medium text-slate-300">{pubDateInfo.relative}</span> · {formatDateShort(job.publication_date)}
+                      </span>
+                      {pubDateInfo.isNew && (
+                        <span className="flex items-center gap-1 ml-1.5 px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-medium border border-emerald-500/20">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                          Nueva
+                        </span>
+                      )}
+                    </div>
+                  );
+                })()}
+                
+                {job.created_at && (() => {
+                  const createdDateInfo = getRelativeDateInfo(job.created_at);
+                  return (
+                    <div className="flex items-center gap-1.5 text-slate-400" title="Fecha Descubierta por Radar">
+                      <Search className="w-4 h-4 shrink-0" />
+                      <span>
+                        Detectada <span className="font-medium text-slate-300">{createdDateInfo.relative}</span> · {formatDateShort(job.created_at)}
+                      </span>
+                    </div>
+                  );
+                })()}
               </div>
             )}
           </div>

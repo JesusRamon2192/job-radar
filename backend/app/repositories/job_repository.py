@@ -30,7 +30,10 @@ class JobRepository:
                 existing.score = job_dict["score"]
                 existing.matches = job_dict["matches"]
                 existing.skills = job_dict["skills"]
-                existing.publication_date = job_dict.get("publication_date")
+                # Opción A: Protegemos la fecha de publicación original. 
+                # Solo la asignamos si estaba vacía previamente.
+                if not existing.publication_date:
+                    existing.publication_date = job_dict.get("publication_date")
                 existing.modality = job_dict.get("modality")
             else:
                 new_job = JobModel(
@@ -87,6 +90,6 @@ class JobRepository:
                 "company": j.company,
                 "publication_date": j.publication_date,
                 "modality": j.modality,
-                "created_at": j.created_at.isoformat() if j.created_at else None
+                "created_at": j.created_at.isoformat() + "Z" if j.created_at else None
             } for j in jobs
         ]
