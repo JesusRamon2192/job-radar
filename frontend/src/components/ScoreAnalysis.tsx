@@ -26,7 +26,7 @@ const CATEGORIES = [
     id: 'devops',
     name: 'DevOps & CI/CD',
     icon: Server,
-    score: 80,
+    score: 90,
     color: 'from-purple-500 to-pink-500',
     skills: ["DevOps", "Linux", "CI/CD", "GitLab", "Git", "API Testing", "Github", "QA"]
   },
@@ -34,7 +34,7 @@ const CATEGORIES = [
     id: 'ai',
     name: 'Artificial Intelligence',
     icon: Cpu,
-    score: 95,
+    score: 88,
     color: 'from-emerald-400 to-teal-500',
     skills: ["OpenAI API", "ChatGPT", "AI Agents", "Prompt Engineering", "Claude Code", "Github Copilot"]
   },
@@ -50,7 +50,7 @@ const CATEGORIES = [
     id: 'observability',
     name: 'Observability',
     icon: Activity,
-    score: 75,
+    score: 70,
     color: 'from-yellow-400 to-orange-500',
     skills: ["New Relic", "Grafana", "Prometheus", "Monitoring", "Observability"]
   },
@@ -69,25 +69,37 @@ export const ScoreAnalysis: React.FC<ScoreAnalysisProps> = ({ onBack }) => {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out pb-20">
       {/* Header Section */}
       <div className="mb-8">
-        <button 
+        <button
           onClick={onBack}
           className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-4 group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Volver al Dashboard
         </button>
-        
+
         <div className="bg-slate-800/50 backdrop-blur-md border border-slate-700/50 p-8 rounded-2xl relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500"></div>
           <h2 className="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">
             Análisis de Score
           </h2>
-          <p className="text-slate-300 max-w-3xl leading-relaxed">
-            El Score es una evaluación dinámica que mide qué tan alineadas están tus habilidades 
-            con los requerimientos de cada vacante. A continuación, se muestra el estado actual 
-            de tu perfil desglosado por áreas tecnológicas clave. Entre mayor sea el porcentaje, 
-            mejor preparado estás para enfrentar retos en esa categoría específica.
-          </p>
+          <div className="space-y-4 text-slate-300 max-w-4xl leading-relaxed">
+            <p>
+              El <strong>Score de Afinidad</strong> es una evaluación dinámica que mide qué tan alineadas están tus habilidades 
+              con los requerimientos de cada vacante. A continuación, se muestra el estado actual 
+              de tu perfil desglosado por áreas tecnológicas clave. 
+            </p>
+            <div className="bg-indigo-500/10 border border-indigo-500/20 p-4 rounded-xl">
+              <h3 className="text-sm font-bold text-indigo-300 mb-2 uppercase tracking-wide">¿Cómo se evalúan las vacantes?</h3>
+              <p className="text-sm">
+                Cuando el radar encuentra una vacante, analiza sus requerimientos técnicos. Por cada habilidad (skill) que hace <em>match</em> con tu perfil, 
+                el sistema te otorga puntos. Sin embargo, <strong>esos puntos no son fijos</strong>; se multiplican por tu porcentaje de dominio en esa categoría.
+                <br /><br />
+                <em>Ejemplo:</em> Si una vacante requiere "React" (categoría Frontend), y tu dominio en Frontend es del 82%, el sistema 
+                multiplicará el puntaje base de la habilidad por 0.82 para determinar cuánto aporta esa categoría al score total de la vacante. 
+                ¡Entre mayor sea tu dominio en un área, más puntos sumarás en vacantes que requieran esas tecnologías!
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -96,8 +108,8 @@ export const ScoreAnalysis: React.FC<ScoreAnalysisProps> = ({ onBack }) => {
         {CATEGORIES.map((category) => {
           const Icon = category.icon;
           return (
-            <div 
-              key={category.id} 
+            <div
+              key={category.id}
               className="group bg-slate-800/40 hover:bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 hover:border-slate-600 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 flex flex-col h-full"
             >
               <div className="flex items-center justify-between mb-6">
@@ -114,8 +126,8 @@ export const ScoreAnalysis: React.FC<ScoreAnalysisProps> = ({ onBack }) => {
 
               {/* Progress Bar */}
               <div className="w-full bg-slate-900/50 rounded-full h-2.5 mb-6 overflow-hidden">
-                <div 
-                  className={`h-2.5 rounded-full bg-gradient-to-r ${category.color} transition-all duration-1000 ease-out`} 
+                <div
+                  className={`h-2.5 rounded-full bg-gradient-to-r ${category.color} transition-all duration-1000 ease-out`}
                   style={{ width: `${category.score}%` }}
                 ></div>
               </div>
@@ -125,8 +137,8 @@ export const ScoreAnalysis: React.FC<ScoreAnalysisProps> = ({ onBack }) => {
                 <h4 className="text-sm font-medium text-slate-400 mb-3 uppercase tracking-wider">Skills Evaluadas</h4>
                 <div className="flex flex-wrap gap-2">
                   {category.skills.map(skill => (
-                    <span 
-                      key={skill} 
+                    <span
+                      key={skill}
                       className="px-2.5 py-1 text-xs font-medium bg-slate-900/80 text-slate-300 border border-slate-700/50 rounded-lg group-hover:border-slate-600 transition-colors"
                     >
                       {skill}

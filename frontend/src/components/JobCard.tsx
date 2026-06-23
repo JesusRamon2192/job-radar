@@ -192,11 +192,18 @@ export const JobCard: React.FC<JobCardProps> = ({ job }) => {
 
       {expanded && (
         <div className="mt-6 pt-6 border-t border-slate-700/50 animate-in fade-in slide-in-from-top-4">
-          <h3 className="text-sm font-semibold text-slate-300 mb-3">Matching Categories</h3>
+          <h3 className="text-sm font-semibold text-slate-300 mb-3">Matching Categories & Score Breakdown</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {Object.entries(job.matches).map(([category, skills]) => (
               <div key={category} className="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
-                <h4 className="text-xs font-medium text-indigo-300 mb-2">{category}</h4>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-xs font-medium text-indigo-300 capitalize">{category}</h4>
+                  {job.category_breakdown && job.category_breakdown[category] !== undefined && (
+                    <span className="text-xs font-bold text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded">
+                      +{job.category_breakdown[category]} pts
+                    </span>
+                  )}
+                </div>
                 <div className="flex flex-wrap gap-1.5">
                   {(skills as string[]).map(s => (
                     <span key={s} className="px-2 py-0.5 bg-indigo-500/10 text-indigo-200 rounded text-xs">

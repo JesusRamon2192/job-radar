@@ -43,6 +43,7 @@ def run_profile_match():
             "title": job.get("title") or job.get("name", "N/A"),
             "score": result["score"],
             "matches": result["matches"],
+            "category_breakdown": result.get("category_breakdown", {}),
             "skills": job.get("skills", []),
             "url": full_url,
             "company": job.get("company", "Desconocida"),

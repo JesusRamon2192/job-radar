@@ -66,3 +66,13 @@ PROFILE = {
         "Frontend Development"
     ]
 }
+
+PROFILE_SCORES = {
+    "cloud": 85,
+    "containers": 90,
+    "devops": 90,
+    "ai": 88,
+    "backend": 88,
+    "observability": 70,
+    "frontend": 82
+}
