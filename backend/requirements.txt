@@ -5,3 +5,4 @@ requests==2.31.0
 sqlalchemy==2.0.25
 psycopg2-binary==2.9.9
 apscheduler==3.10.4
+beautifulsoup4==4.12.3
