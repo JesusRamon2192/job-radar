@@ -90,6 +90,6 @@ class JobRepository:
                 "company": j.company,
                 "publication_date": j.publication_date,
                 "modality": j.modality,
-                "created_at": j.created_at.isoformat() if j.created_at else None
+                "created_at": j.created_at.isoformat() + "Z" if j.created_at else None
             } for j in jobs
         ]
