@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Building2, SlidersHorizontal, ArrowDownWideNarrow, Star, Briefcase, Code2, ChevronDown, Check } from 'lucide-react';
+import { Search, Building2, ArrowDownWideNarrow, Star, Briefcase, Code2, ChevronDown, Check } from 'lucide-react';
 
 interface JobFiltersProps {
   search: string;
@@ -30,7 +30,7 @@ export const JobFilters: React.FC<JobFiltersProps> = ({
   skills, setSkills,
   availableSkills
 }) => {
-  const [openDropdown, setOpenDropdown] = useState<'modalities' | 'skills' | 'company' | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<'modalities' | 'skills' | 'company' | 'sort' | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

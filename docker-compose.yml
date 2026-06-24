@@ -4,64 +4,50 @@ services:
   db:
     image: postgres:15
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: devradar
-    ports:
-      - "${DB_PORT:-5432}:5432"
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin123}
+      POSTGRES_DB: ${POSTGRES_DB:-devradar}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d devradar"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-devradar}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
 
   backend:
     build:
       context: .
       dockerfile: Dockerfile.backend
-    ports:
-      - "${BACKEND_PORT:-8000}:8000"
+    command: gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
     environment:
       - PYTHONUNBUFFERED=1
-      - DATABASE_URL=postgresql://admin:admin123@db:5432/devradar
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD:-admin123}@db:5432/${POSTGRES_DB:-devradar}
       - REDIS_URL=redis://redis:6379/0
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - ENVIRONMENT=production
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 30s
       timeout: 10s
       retries: 3
-
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-    ports:
-      - "${FRONTEND_PORT:-3001}:3000"
-    depends_on:
-      backend:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "${REDIS_PORT:-6379}"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    restart: always
 
   celery_worker:
     build:
@@ -70,15 +56,40 @@ services:
     command: celery -A app.worker.celery_app worker --loglevel=info -B
     environment:
       - PYTHONUNBUFFERED=1
-      - DATABASE_URL=postgresql://admin:admin123@db:5432/devradar
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD:-admin123}@db:5432/${POSTGRES_DB:-devradar}
       - REDIS_URL=redis://redis:6379/0
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - ENVIRONMENT=production
     depends_on:
       redis:
         condition: service_healthy
       db:
         condition: service_healthy
+    restart: always
+
+  frontend-builder:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    # Build the static files
+    command: npm run build
+    volumes:
+      - frontend_build:/app/dist
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "${FRONTEND_PORT:-3333}:80"
+      # - "443:443" # Comentado por si se usa un reverse proxy externo (Traefik/Cloudflare)
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - frontend_build:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+      - frontend-builder
+    restart: always
 
 volumes:
   pgdata:
+  frontend_build:
