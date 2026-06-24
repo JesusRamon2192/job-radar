@@ -26,6 +26,9 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - DATABASE_URL=postgresql://admin:admin123@db:5432/devradar
+      - REDIS_URL=redis://redis:6379/0
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
     depends_on:
       db:
         condition: service_healthy
@@ -49,6 +52,33 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    command: celery -A app.worker.celery_app worker --loglevel=info -B
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DATABASE_URL=postgresql://admin:admin123@db:5432/devradar
+      - REDIS_URL=redis://redis:6379/0
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
 
 volumes:
   pgdata:

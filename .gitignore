@@ -175,3 +175,12 @@ cython_debug/
 comandos.txt
 scratch/*
 refresh.sh
+
+# Scraper output and backups
+*.bkp
+backend/*.html
+backend/*.txt
+backend/globant_sample.json
+backend/scratch*.py
+backend/test_*.py
+todo.md

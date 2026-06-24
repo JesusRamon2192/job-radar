@@ -5,11 +5,12 @@ from typing import List, Optional
 from datetime import datetime
 import asyncio
 from apscheduler.schedulers.background import BackgroundScheduler
-
+from zoneinfo import ZoneInfo
 from app.analysis.api_adapter import run_profile_match
 from app.database.db import get_db, engine, Base, SessionLocal
 from app.repositories.job_repository import JobRepository
 from app.models.job import JobModel
+from app.models.user import UserModel
 
 app = FastAPI(title="DevRadar API")
 
@@ -52,12 +53,25 @@ async def startup_event():
     Base.metadata.create_all(bind=engine)
     
     # Schedule daily job
-    scheduler.add_job(refresh_jobs_task, 'cron', hour=0, minute=0)
+    scheduler.add_job(
+        refresh_jobs_task, 
+        'cron', 
+        hour=0, 
+        minute=0, 
+        timezone=ZoneInfo("America/Mexico_City")
+    )
     scheduler.start()
     
-    # Trigger an initial fetch if DB is empty
+    # Trigger an initial fetch if DB is empty and create mock user
     db = SessionLocal()
     try:
+        user = db.query(UserModel).filter(UserModel.email == "jesus.ramon2192@gmail.com").first()
+        if not user:
+            new_user = UserModel(email="jesus.ramon2192@gmail.com", hashed_password="mock", is_pro=True)
+            db.add(new_user)
+            db.commit()
+            print("Mock PRO user inserted")
+
         repo = JobRepository(db)
         count = db.query(JobModel).count()
         if count == 0 and not _STATE["is_refreshing"]:

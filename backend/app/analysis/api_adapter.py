@@ -4,6 +4,7 @@ from app.collectors.accenture import AccentureCollector
 from app.collectors.globant import GlobantCollector
 from app.collectors.ibm import IbmCollector
 from app.collectors.greenhouse import GreenhouseCollector
+from app.collectors.axity import AxityCollector
 from app.services.matcher_service import MatcherService
 from datetime import datetime
 
@@ -14,6 +15,7 @@ def run_profile_match():
     globant_collector = GlobantCollector()
     ibm_collector = IbmCollector()
     greenhouse_collector = GreenhouseCollector()
+    axity_collector = AxityCollector()
     matcher = MatcherService()
 
     epam_jobs = epam_collector.collect()
@@ -22,8 +24,9 @@ def run_profile_match():
     globant_jobs = globant_collector.collect()
     ibm_jobs = ibm_collector.collect()
     greenhouse_jobs = greenhouse_collector.collect()
+    axity_jobs = axity_collector.collect()
 
-    jobs = epam_jobs + softek_jobs + accenture_jobs + globant_jobs + ibm_jobs + greenhouse_jobs
+    jobs = epam_jobs + softek_jobs + accenture_jobs + globant_jobs + ibm_jobs + greenhouse_jobs + axity_jobs
     results = []
 
     for job in jobs:
@@ -37,9 +40,10 @@ def run_profile_match():
             full_url = job.get("url", "N/A")
 
         results.append({
-            "title": job.get("name", "N/A"),
+            "title": job.get("title") or job.get("name", "N/A"),
             "score": result["score"],
             "matches": result["matches"],
+            "category_breakdown": result.get("category_breakdown", {}),
             "skills": job.get("skills", []),
             "url": full_url,
             "company": job.get("company", "Desconocida"),

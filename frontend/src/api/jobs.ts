@@ -6,6 +6,7 @@ export interface Job {
   title: string;
   score: number;
   matches: Record<string, string[]>;
+  category_breakdown?: Record<string, number>;
   skills: string[];
   url: string;
   company: string;

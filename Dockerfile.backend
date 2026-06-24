@@ -14,6 +14,7 @@ COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/app ./app
+COPY backend/test_email.py .
 
 # Add the parent directory to PYTHONPATH so "app" can be resolved
 ENV PYTHONPATH=/
