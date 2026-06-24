@@ -17,6 +17,6 @@ jobs:
         run: |
           cd /home/jesus/docker/compose/job-radar
           git pull origin main
-          docker compose down -v
-          docker system prune -af --volumes
+          docker compose down
+          docker system prune -af
           docker compose up --build -d

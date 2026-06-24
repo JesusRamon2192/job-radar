@@ -4,6 +4,7 @@ import { DashboardStats } from './components/DashboardStats';
 import { JobFilters } from './components/JobFilters';
 import { JobCard } from './components/JobCard';
 import { ScoreAnalysis } from './components/ScoreAnalysis';
+import { Footer } from './components/Footer';
 import { fetchJobs } from './api/jobs';
 import type { Job } from './api/jobs';
 
@@ -112,6 +113,8 @@ function App() {
           )}
         </main>
       )}
+      
+      <Footer />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Radar, Activity, User, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AuthModal } from './AuthModal';
+import { SupportModal } from './SupportModal';
 
 interface HeaderProps {
   lastUpdated: string | null;
@@ -11,6 +12,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ lastUpdated, onAnalyzeScore }) => {
   const { user, logout } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
   const [authTab, setAuthTab] = useState<'login' | 'register'>('login');
 
   const openAuth = (tab: 'login' | 'register') => {
@@ -47,6 +49,13 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, onAnalyzeScore }) =
                 <span>Análisis de Score</span>
               </button>
             )}
+            
+            <button
+              onClick={() => setIsSupportModalOpen(true)}
+              className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-800/80 hover:bg-slate-700/80 text-rose-300 hover:text-rose-200 text-sm font-medium rounded-xl transition-all border border-rose-500/20 hover:border-rose-500/40 hover:shadow-lg hover:shadow-rose-500/10"
+            >
+              <span>Donaciones ☕</span>
+            </button>
 
             <div className="h-6 w-px bg-slate-700 hidden sm:block"></div>
 
@@ -88,6 +97,11 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, onAnalyzeScore }) =
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
         defaultTab={authTab} 
+      />
+      
+      <SupportModal 
+        isOpen={isSupportModalOpen}
+        onClose={() => setIsSupportModalOpen(false)}
       />
     </>
   );
