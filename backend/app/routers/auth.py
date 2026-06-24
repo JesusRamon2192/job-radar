@@ -44,10 +44,26 @@ def register_user(user_in: UserCreate, db: Session = Depends(get_db)):
             detail="The user with this email already exists in the system.",
         )
     
-    # default simple profile
+    # default comprehensive profile
     default_profile = {
-        "skills": ["python"],
-        "weights": {"python": 100}
+        "categories": {
+            "Cloud Computing": ["Amazon Web Services", "AWS", "Google Cloud Platform", "GCP", "Microsoft Azure", "Azure", "Cloud Native"],
+            "Containers": ["Docker", "Docker Compose", "Kubernetes", "K8s", "EKS", "AKS", "Helm"],
+            "DevOps & CI/CD": ["DevOps", "Linux", "CI/CD", "GitLab", "Git", "GitHub Actions", "Jenkins", "Terraform", "Ansible", "Bash"],
+            "Artificial Intelligence": ["OpenAI API", "ChatGPT", "AI Agents", "Prompt Engineering", "Machine Learning", "LLMs", "LangChain"],
+            "Backend": ["Python", "Node.js", "Java", "PostgreSQL", "REST API", "GraphQL", "MongoDB", "Redis", "MySQL", "Spring Boot", "Express", "Django", "FastAPI", "C#", ".NET", "Go"],
+            "Observability": ["New Relic", "Grafana", "Prometheus", "Datadog", "Splunk", "ELK"],
+            "Frontend": ["JavaScript", "HTML", "CSS", "React", "TypeScript", "Tailwind CSS", "Vue.js", "Angular", "Next.js", "Redux"]
+        },
+        "weights": {
+            "Cloud Computing": 80,
+            "Containers": 85,
+            "DevOps & CI/CD": 80,
+            "Artificial Intelligence": 75,
+            "Backend": 85,
+            "Observability": 70,
+            "Frontend": 85
+        }
     }
     
     user = UserModel(
