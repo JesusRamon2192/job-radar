@@ -183,4 +183,5 @@ backend/*.txt
 backend/globant_sample.json
 backend/scratch*.py
 backend/test_*.py
+!backend/test_email.py
 todo.md
