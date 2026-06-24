@@ -5,59 +5,46 @@ from app.collectors.globant import GlobantCollector
 from app.collectors.ibm import IbmCollector
 from app.collectors.greenhouse import GreenhouseCollector
 from app.collectors.axity import AxityCollector
-from app.services.matcher_service import MatcherService
-from datetime import datetime
+from app.services.cache_service import CacheService
 
 def run_profile_match():
-    epam_collector = EpamCollector()
-    softek_collector = SoftekCollector()
-    accenture_collector = AccentureCollector()
-    globant_collector = GlobantCollector()
-    ibm_collector = IbmCollector()
-    greenhouse_collector = GreenhouseCollector()
-    axity_collector = AxityCollector()
-    matcher = MatcherService()
-
-    epam_jobs = epam_collector.collect()
-    softek_jobs = softek_collector.collect()
-    accenture_jobs = accenture_collector.collect()
-    globant_jobs = globant_collector.collect()
-    ibm_jobs = ibm_collector.collect()
-    greenhouse_jobs = greenhouse_collector.collect()
-    axity_jobs = axity_collector.collect()
-
-    jobs = epam_jobs + softek_jobs + accenture_jobs + globant_jobs + ibm_jobs + greenhouse_jobs + axity_jobs
-    results = []
-
-    for job in jobs:
-        result = matcher.score(job)
-
-        if job.get("company") == "EPAM":
-            seo = job.get("seo") or {}
-            url_path = seo.get("url", "")
-            full_url = f"https://careers.epam.com{url_path}" if url_path else "N/A"
+    collectors = {
+        "epam": EpamCollector(),
+        "softek": SoftekCollector(),
+        "accenture": AccentureCollector(),
+        "globant": GlobantCollector(),
+        "ibm": IbmCollector(),
+        "greenhouse": GreenhouseCollector(),
+        "axity": AxityCollector()
+    }
+    
+    all_raw_jobs = []
+    
+    for name, collector in collectors.items():
+        cached_jobs = CacheService.get_raw_jobs(name)
+        if cached_jobs is not None:
+            all_raw_jobs.extend(cached_jobs)
         else:
-            full_url = job.get("url", "N/A")
+            try:
+                jobs = collector.collect()
+                # Format url for epam if missing domain
+                if name == "epam":
+                    for job in jobs:
+                        seo = job.get("seo") or {}
+                        url_path = seo.get("url", "")
+                        job["url"] = f"https://careers.epam.com{url_path}" if url_path else "N/A"
+                elif name == "axity":
+                    for job in jobs:
+                        job["url"] = job.get("url", "N/A")
+                
+                CacheService.save_raw_jobs(name, jobs)
+                all_raw_jobs.extend(jobs)
+            except Exception as e:
+                print(f"Error collecting from {name}: {e}")
 
-        results.append({
-            "title": job.get("title") or job.get("name", "N/A"),
-            "score": result["score"],
-            "matches": result["matches"],
-            "category_breakdown": result.get("category_breakdown", {}),
-            "skills": job.get("skills", []),
-            "url": full_url,
-            "company": job.get("company", "Desconocida"),
-            "publication_date": job.get("publication_date"),
-            "modality": job.get("modality", "Unknown")
-        })
-
-    # Ordenar por score por defecto
-    results.sort(
-        key=lambda x: x["score"],
-        reverse=True
-    )
+    CacheService.save_last_updated()
 
     return {
-        "jobs": results,
-        "last_updated": datetime.now().isoformat()
+        "jobs": all_raw_jobs,
+        "last_updated": CacheService.get_last_updated()
     }
