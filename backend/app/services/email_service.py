@@ -74,7 +74,7 @@ class EmailService:
                 {% endfor %}
               </ul>
               <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #a0aec0;">
-                <p>Estás recibiendo este correo porque eres un usuario PRO en DevLATAM.</p>
+                <p>Estás recibiendo este correo porque eres un usuario registrado en DevLATAM.</p>
               </div>
             </div>
           </body>
