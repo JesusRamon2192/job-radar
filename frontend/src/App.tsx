@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Header } from './components/Header';
 import { DashboardStats } from './components/DashboardStats';
+import { RegistrationBanner } from './components/RegistrationBanner';
 import { JobFilters } from './components/JobFilters';
 import { JobCard } from './components/JobCard';
 import { ScoreAnalysis } from './components/ScoreAnalysis';
@@ -106,6 +107,8 @@ function App() {
         <main className="container mx-auto px-4 mt-4 max-w-6xl min-[1600px]:max-w-[1536px]">
           <DashboardStats jobs={jobs} />
           
+          <RegistrationBanner />
+
           <JobFilters 
             search={search} setSearch={setSearch}
             company={company} setCompany={setCompany}
