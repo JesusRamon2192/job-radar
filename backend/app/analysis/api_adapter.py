@@ -7,7 +7,7 @@ from app.collectors.greenhouse import GreenhouseCollector
 from app.collectors.axity import AxityCollector
 from app.services.cache_service import CacheService
 
-def run_profile_match():
+def run_profile_match(force_refresh=False):
     collectors = {
         "epam": EpamCollector(),
         "softek": SoftekCollector(),
@@ -21,7 +21,7 @@ def run_profile_match():
     all_raw_jobs = []
     
     for name, collector in collectors.items():
-        cached_jobs = CacheService.get_raw_jobs(name)
+        cached_jobs = None if force_refresh else CacheService.get_raw_jobs(name)
         if cached_jobs is not None:
             all_raw_jobs.extend(cached_jobs)
         else:
