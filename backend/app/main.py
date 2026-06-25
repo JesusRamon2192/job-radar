@@ -49,7 +49,10 @@ def refresh_jobs_task():
     _STATE["is_refreshing"] = True
     db = SessionLocal()
     try:
-        run_profile_match()
+        from app.repositories.job_repository import JobRepository
+        result = run_profile_match(force_refresh=True)
+        repo = JobRepository(db)
+        repo.save_all(result["jobs"])
     except Exception as e:
         print(f"Error refreshing jobs: {e}")
     finally:
