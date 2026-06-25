@@ -15,7 +15,7 @@ from app.utils.security import (
     ACCESS_TOKEN_EXPIRE_MINUTES
 )
 
-router = APIRouter(prefix="/api/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["auth"])
 
 class UserCreate(BaseModel):
     email: str
