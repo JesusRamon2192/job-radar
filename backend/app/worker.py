@@ -35,13 +35,13 @@ celery_app.conf.beat_schedule = {
 def send_daily_emails_task():
     """
     Task triggered at 8 AM.
-    It fetches all PRO users and delegates the email sending
+    It fetches all active users and delegates the email sending
     for each user to another background task for scalability.
     """
     db = SessionLocal()
     try:
-        pro_users = db.query(UserModel).filter(UserModel.is_pro == True, UserModel.is_active == True).all()
-        for user in pro_users:
+        active_users = db.query(UserModel).filter(UserModel.is_active == True).all()
+        for user in active_users:
             # We delay the individual email sending task so it scales horizontally
             send_user_email_task.delay(user.id)
     finally:
