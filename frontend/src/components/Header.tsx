@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Radar, Activity, User, LogOut } from 'lucide-react';
+import { Radar, Activity, User, LogOut, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AuthModal } from './AuthModal';
 import { SupportModal } from './SupportModal';
@@ -34,9 +34,12 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, onAnalyzeScore }) =
           </div>
 
           <div className="flex items-center gap-4 sm:gap-6">
-            {lastUpdated && (
-              <div className="text-xs text-slate-400 hidden lg:block">
-                Última actualización: {new Date(lastUpdated).toLocaleTimeString()}
+            {lastUpdated && lastUpdated !== 'Never' && !isNaN(new Date(lastUpdated).getTime()) && (
+              <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/50 border border-slate-700/50 rounded-full text-xs font-medium text-slate-300 shadow-sm hover:bg-slate-800/80 transition-colors">
+                <Clock className="w-3.5 h-3.5 text-indigo-400" />
+                <span>
+                  Actualizado: <span className="text-slate-100">{new Date(lastUpdated).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })} a las {new Date(lastUpdated).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</span>
+                </span>
               </div>
             )}
             
