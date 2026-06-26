@@ -6,7 +6,7 @@ export const Footer: React.FC = () => {
     <footer className="w-full border-t border-slate-800 bg-slate-900/50 mt-12 py-8 text-sm">
       <div className="container mx-auto px-4 max-w-6xl min-[1600px]:max-w-[1536px]">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          
+
           {/* Brand & Description */}
           <div className="space-y-4">
             <h2 className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
@@ -16,7 +16,7 @@ export const Footer: React.FC = () => {
               Un motor de búsqueda y agregador de vacantes diseñado para ayudar a desarrolladores en LATAM a encontrar su trabajo ideal basándose en la compatibilidad de habilidades.
             </p>
             <p className="text-slate-500 flex items-center gap-1">
-              Hecho con <Heart className="w-3 h-3 text-rose-500 fill-rose-500/20" /> por la comunidad.
+              Hecho con <Heart className="w-3 h-3 text-rose-500 fill-rose-500/20" />.
             </p>
           </div>
 
@@ -53,7 +53,7 @@ export const Footer: React.FC = () => {
           </div>
 
         </div>
-        
+
         <div className="mt-8 pt-8 border-t border-slate-800/50 text-center text-slate-500 text-xs">
           <p>© {new Date().getFullYear()} DevLATAM. Todos los derechos reservados. Las ofertas de trabajo son propiedad de sus respectivas plataformas originales.</p>
         </div>
