@@ -20,17 +20,21 @@ class JobRepository:
         # The prompt says: "(Por ahora, la propuesta asume que mantendremos todas...)"
         # Okay, let's try to find by URL and company.
         for job_dict in jobs_data:
+            job_title = job_dict.get("title") or job_dict.get("name", "N/A")
+            job_url = job_dict.get("url", "N/A")
+            job_company = job_dict.get("company", "Desconocida")
+
             existing = self.db.query(JobModel).filter(
-                JobModel.url == job_dict["url"],
-                JobModel.title == job_dict["title"],
-                JobModel.company == job_dict["company"]
+                JobModel.url == job_url,
+                JobModel.title == job_title,
+                JobModel.company == job_company
             ).first()
             
             if existing:
-                existing.score = job_dict["score"]
-                existing.matches = job_dict["matches"]
+                existing.score = job_dict.get("score", 0)
+                existing.matches = job_dict.get("matches", [])
                 existing.category_breakdown = job_dict.get("category_breakdown", {})
-                existing.skills = job_dict["skills"]
+                existing.skills = job_dict.get("skills", [])
                 # Opción A: Protegemos la fecha de publicación original. 
                 # Solo la asignamos si estaba vacía previamente.
                 if not existing.publication_date:
@@ -38,13 +42,13 @@ class JobRepository:
                 existing.modality = job_dict.get("modality")
             else:
                 new_job = JobModel(
-                    title=job_dict["title"],
-                    score=job_dict["score"],
-                    matches=job_dict["matches"],
+                    title=job_title,
+                    score=job_dict.get("score", 0),
+                    matches=job_dict.get("matches", []),
                     category_breakdown=job_dict.get("category_breakdown", {}),
-                    skills=job_dict["skills"],
-                    url=job_dict["url"],
-                    company=job_dict["company"],
+                    skills=job_dict.get("skills", []),
+                    url=job_url,
+                    company=job_company,
                     publication_date=job_dict.get("publication_date"),
                     modality=job_dict.get("modality")
                 )
