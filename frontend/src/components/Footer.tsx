@@ -40,7 +40,7 @@ export const Footer: React.FC = () => {
           <div className="space-y-4">
             <h3 className="font-semibold text-slate-200">Contacto</h3>
             <div className="flex gap-4">
-              <a href="#" className="p-2 bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 rounded-lg text-slate-400 hover:text-white transition-all">
+              <a href="https://github.com/JesusRamon2192/job-radar" target="_blank" rel="noopener noreferrer" className="p-2 bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 rounded-lg text-slate-400 hover:text-white transition-all">
                 <Github className="w-5 h-5" />
               </a>
               <a href="#" className="p-2 bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 rounded-lg text-slate-400 hover:text-[#1DA1F2] transition-all">
