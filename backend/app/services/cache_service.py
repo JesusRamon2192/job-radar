@@ -24,8 +24,8 @@ class CacheService:
         
     @staticmethod
     def save_last_updated():
-        from datetime import datetime
-        redis_client.set("jobs:last_updated", datetime.now().isoformat())
+        from datetime import datetime, timezone
+        redis_client.set("jobs:last_updated", datetime.now(timezone.utc).isoformat())
         
     @staticmethod
     def get_last_updated() -> str:
