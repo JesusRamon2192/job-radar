@@ -18,7 +18,7 @@ export const RegistrationBanner: React.FC = () => {
     if (isSubscribed && isVisible) {
       // Mark as seen so it won't appear on subsequent reloads
       localStorage.setItem('hasSeenSubscriptionSuccess', 'true');
-      
+
       // Auto-hide after a few seconds for better UX
       const timer = setTimeout(() => {
         setIsVisible(false);
@@ -38,7 +38,7 @@ export const RegistrationBanner: React.FC = () => {
             ✅ Ya estás suscrito. Te enviaremos nuevas vacantes a tu correo registrado.
           </p>
         </div>
-        <button 
+        <button
           onClick={() => setIsVisible(false)}
           className="text-emerald-500 hover:text-emerald-400 transition-colors"
         >
@@ -63,7 +63,7 @@ export const RegistrationBanner: React.FC = () => {
               📬 Registrate
             </h3>
             <p className="text-slate-400 text-sm mt-0.5">
-              Regístrate gratis y recibe por correo las nuevas vacantes.
+              Regístrate y recibe por correo nuevas vacantes.
             </p>
           </div>
         </div>
@@ -77,9 +77,9 @@ export const RegistrationBanner: React.FC = () => {
         </button>
       </div>
 
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
         defaultTab="register"
       />
     </>
