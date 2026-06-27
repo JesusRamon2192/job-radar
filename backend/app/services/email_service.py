@@ -34,7 +34,7 @@ class EmailService:
             return
 
         message = MIMEMultipart("alternative")
-        message["Subject"] = f"DevLATAM: ¡{len(jobs)} nuevas vacantes para ti!"
+        message["Subject"] = f"DevLATAM: ¡{len(jobs)} nuevas vacantes!"
         message["From"] = f"DevLATAM <{self.sender_email}>"
         message["To"] = user.email
 
