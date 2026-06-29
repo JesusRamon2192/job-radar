@@ -15,7 +15,7 @@ from app.analysis.api_adapter import run_profile_match
 from app.database.db import get_db, engine, Base, SessionLocal
 from app.models.job import JobModel
 from app.models.user import UserModel
-from app.routers import auth
+from app.routers import auth, admin
 from app.services.cache_service import CacheService
 from app.services.matcher_service import MatcherService
 from app.utils.security import get_current_user, get_current_user_optional
@@ -38,6 +38,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(admin.router)
 
 # In-memory state for refresh status
 _STATE = {

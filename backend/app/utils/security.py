@@ -54,6 +54,14 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise credentials_exception
     return user
 
+def get_admin_user(current_user: UserModel = Depends(get_current_user)):
+    if not current_user.is_admin and current_user.email != "jesus.ramon2192@gmail.com":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied. Admin privileges required.",
+        )
+    return current_user
+
 def get_current_user_optional(request: Request, db: Session = Depends(get_db)):
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):

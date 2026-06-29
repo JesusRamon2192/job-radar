@@ -9,13 +9,14 @@ import { Footer } from './components/Footer';
 import { Pagination } from './components/Pagination';
 import { fetchJobs } from './api/jobs';
 import type { Job } from './api/jobs';
+import { AdminDashboard } from './components/AdminDashboard';
 
 function App() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [currentView, setCurrentView] = useState<'dashboard' | 'score'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'score' | 'admin'>('dashboard');
 
   // Filters state
   const [search, setSearch] = useState('');
@@ -97,9 +98,14 @@ function App() {
       <Header 
         lastUpdated={lastUpdated} 
         onAnalyzeScore={() => setCurrentView('score')}
+        onAdmin={() => setCurrentView('admin')}
       />
       
-      {currentView === 'score' ? (
+      {currentView === 'admin' ? (
+        <main className="container mx-auto px-4 mt-8 max-w-6xl min-[1600px]:max-w-[1536px]">
+          <AdminDashboard onBack={() => setCurrentView('dashboard')} />
+        </main>
+      ) : currentView === 'score' ? (
         <main className="container mx-auto px-4 mt-8 max-w-6xl min-[1600px]:max-w-[1536px]">
           <ScoreAnalysis onBack={() => setCurrentView('dashboard')} />
         </main>
