@@ -7,9 +7,10 @@ import { SupportModal } from './SupportModal';
 interface HeaderProps {
   lastUpdated: string | null;
   onAnalyzeScore?: () => void;
+  onAdmin?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ lastUpdated, onAnalyzeScore }) => {
+export const Header: React.FC<HeaderProps> = ({ lastUpdated, onAnalyzeScore, onAdmin }) => {
   const { user, logout } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
@@ -50,6 +51,16 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, onAnalyzeScore }) =
               >
                 <Activity className="w-4 h-4" />
                 <span>Análisis de Score</span>
+              </button>
+            )}
+
+            {user && (user.email === 'jesus.ramon2192@gmail.com' || user.is_admin) && onAdmin && (
+              <button
+                onClick={onAdmin}
+                className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-xl transition-all border border-slate-700"
+              >
+                <User className="w-4 h-4" />
+                <span>Admin</span>
               </button>
             )}
             

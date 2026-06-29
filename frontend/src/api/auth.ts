@@ -6,6 +6,7 @@ export interface UserProfile {
   id: number;
   email: string;
   is_pro: boolean;
+  is_admin?: boolean;
   profile_config?: Record<string, any>;
 }
 
