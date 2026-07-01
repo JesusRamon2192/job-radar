@@ -5,6 +5,7 @@ from app.collectors.globant import GlobantCollector
 from app.collectors.ibm import IbmCollector
 from app.collectors.greenhouse import GreenhouseCollector
 from app.collectors.axity import AxityCollector
+from app.collectors.hcl import HclCollector
 from app.services.cache_service import CacheService
 
 def run_profile_match(force_refresh=False):
@@ -15,7 +16,8 @@ def run_profile_match(force_refresh=False):
         "globant": GlobantCollector(),
         "ibm": IbmCollector(),
         "greenhouse": GreenhouseCollector(),
-        "axity": AxityCollector()
+        "axity": AxityCollector(),
+        "hcl": HclCollector()
     }
     
     all_raw_jobs = []

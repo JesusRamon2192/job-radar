@@ -138,7 +138,7 @@ def get_jobs(
     current_user: Optional[UserModel] = Depends(get_current_user_optional)
 ):
     raw_jobs = []
-    sources = ["epam", "softek", "accenture", "globant", "ibm", "greenhouse", "axity"]
+    sources = ["epam", "softek", "accenture", "globant", "ibm", "greenhouse", "axity", "hcl"]
     for source in sources:
         jobs = CacheService.get_raw_jobs(source)
         if jobs:

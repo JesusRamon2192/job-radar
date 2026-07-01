@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, User, Mail, Send, Activity, ShieldCheck, AlertCircle, Trash2 } from 'lucide-react';
+import { ArrowLeft, User, Mail, Send, Activity, ShieldCheck, AlertCircle, Trash2, RefreshCw } from 'lucide-react';
 import { getUsers, forceEmailSend, deleteUser } from '../api/admin';
+import { refreshJobs } from '../api/jobs';
 import type { AdminUser } from '../api/admin';
 import { useAuth } from '../context/AuthContext';
 
@@ -29,6 +30,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
       setError(err.response?.data?.detail || 'Failed to fetch users');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRefresh = async () => {
+    try {
+      const res = await refreshJobs();
+      setActionMessage({ text: res.message || 'Refresh task queued successfully', type: 'success' });
+      setTimeout(() => setActionMessage(null), 3000);
+    } catch (err: any) {
+      console.error(err);
+      setActionMessage({ text: err.response?.data?.detail || err.response?.data?.message || 'Failed to trigger refresh', type: 'error' });
+      setTimeout(() => setActionMessage(null), 3000);
     }
   };
 
@@ -86,20 +99,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         </div>
       )}
 
-      <div className="flex items-center gap-4 mb-8">
-        <button 
-          onClick={onBack}
-          className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-white"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-        <div>
-          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <ShieldCheck className="w-8 h-8 text-indigo-400" />
-            Admin Dashboard
-          </h1>
-          <p className="text-slate-400 mt-1">Manage users and system actions</p>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={onBack}
+            className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-white"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <div>
+            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+              <ShieldCheck className="w-8 h-8 text-indigo-400" />
+              Admin Dashboard
+            </h1>
+            <p className="text-slate-400 mt-1">Manage users and system actions</p>
+          </div>
         </div>
+
+        <button
+          onClick={handleRefresh}
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-medium transition-colors shadow-lg shadow-indigo-500/20"
+        >
+          <RefreshCw className="w-5 h-5" />
+          <span>Refresh Vacancies</span>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
