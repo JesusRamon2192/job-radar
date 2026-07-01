@@ -18,5 +18,4 @@ jobs:
           cd /home/jesus/docker/compose/job-radar
           git pull origin main
           docker compose down --remove-orphans
-          docker system prune -af
           docker compose up --build -d

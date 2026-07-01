@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y \
 
 COPY backend/requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --default-timeout=100 -r requirements.txt
 
 ARG CACHEBUST=1
 COPY backend/app ./app
