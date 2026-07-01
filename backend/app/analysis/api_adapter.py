@@ -27,6 +27,13 @@ def run_profile_match(force_refresh=False):
         else:
             try:
                 jobs = collector.collect()
+                if not jobs:
+                    print(f"Warning: {name} returned 0 jobs, keeping old cache if any.")
+                    old_jobs = CacheService.get_raw_jobs(name)
+                    if old_jobs:
+                        all_raw_jobs.extend(old_jobs)
+                    continue
+
                 # Format url for epam if missing domain
                 if name == "epam":
                     for job in jobs:
@@ -41,6 +48,9 @@ def run_profile_match(force_refresh=False):
                 all_raw_jobs.extend(jobs)
             except Exception as e:
                 print(f"Error collecting from {name}: {e}")
+                old_jobs = CacheService.get_raw_jobs(name)
+                if old_jobs:
+                    all_raw_jobs.extend(old_jobs)
 
     CacheService.save_last_updated()
 
