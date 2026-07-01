@@ -8,7 +8,7 @@ redis_client = redis.from_url(redis_url, decode_responses=True)
 
 class CacheService:
     @staticmethod
-    def save_raw_jobs(source: str, jobs: List[Dict], expire_seconds: int = 43200): # 12 hours
+    def save_raw_jobs(source: str, jobs: List[Dict], expire_seconds: int = 604800): # 7 days
         """Save raw scraped jobs to Redis."""
         key = f"jobs:raw:{source}"
         redis_client.set(key, json.dumps(jobs), ex=expire_seconds)
