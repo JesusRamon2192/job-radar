@@ -11,7 +11,7 @@ export const useJobStatus = (initialJob: Job) => {
     // Check if user is logged in
     const token = localStorage.getItem('token');
     if (!token) {
-      if (newStatus !== 'VIEWED') {
+      if (newStatus === 'SAVED' || newStatus === 'APPLIED') {
         setError("Inicia sesión para guardar el progreso de tus vacantes.");
       }
       return;
