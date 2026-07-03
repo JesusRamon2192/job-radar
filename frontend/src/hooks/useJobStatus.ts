@@ -8,6 +8,15 @@ export const useJobStatus = (initialJob: Job) => {
   const [error, setError] = useState<string | null>(null);
 
   const updateStatus = useCallback(async (newStatus: 'VIEWED' | 'SAVED' | 'APPLIED' | 'SENT') => {
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    if (!token) {
+      if (newStatus === 'SAVED' || newStatus === 'APPLIED') {
+        setError("Inicia sesión para guardar el progreso de tus vacantes.");
+      }
+      return;
+    }
+
     // If the job already has this status, don't update
     if (job.status === newStatus) return;
 
@@ -42,6 +51,12 @@ export const useJobStatus = (initialJob: Job) => {
   }, [job.url, job.status]);
 
   const resetStatus = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError("Inicia sesión para poder reiniciar el historial.");
+      return;
+    }
+
     const previousStatus = job.status;
     setJob(prev => {
       const { status, ...rest } = prev;
