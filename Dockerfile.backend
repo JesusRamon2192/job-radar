@@ -16,6 +16,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 ARG CACHEBUST=1
 COPY backend/app ./app
+COPY backend/alembic ./alembic
+COPY backend/alembic.ini .
 COPY backend/test_email.py .
 
 # Add the parent directory to PYTHONPATH so "app" can be resolved
