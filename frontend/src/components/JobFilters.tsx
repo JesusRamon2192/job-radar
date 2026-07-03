@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Building2, ArrowDownWideNarrow, Star, Briefcase, Code2, ChevronDown, Check } from 'lucide-react';
+import { Search, Building2, ArrowDownWideNarrow, Star, Briefcase, Code2, ChevronDown, Check, Activity } from 'lucide-react';
 
 interface JobFiltersProps {
   search: string;
@@ -17,6 +17,8 @@ interface JobFiltersProps {
   skills: string[];
   setSkills: (val: string[]) => void;
   availableSkills: string[];
+  status: string;
+  setStatus: (val: string) => void;
 }
 
 export const JobFilters: React.FC<JobFiltersProps> = ({
@@ -28,9 +30,10 @@ export const JobFilters: React.FC<JobFiltersProps> = ({
   modalities, setModalities,
   availableModalities,
   skills, setSkills,
-  availableSkills
+  availableSkills,
+  status, setStatus
 }) => {
-  const [openDropdown, setOpenDropdown] = useState<'modalities' | 'skills' | 'company' | 'sort' | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<'modalities' | 'skills' | 'company' | 'sort' | 'status' | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -105,6 +108,41 @@ export const JobFilters: React.FC<JobFiltersProps> = ({
                         {sortBy === option.value && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                       </div>
                       <span className={`text-sm group-hover:text-slate-100 ${sortBy === option.value ? 'text-slate-200 font-medium' : 'text-slate-300'}`}>{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Status Dropdown */}
+          <div className="relative w-full md:w-44">
+            <button
+              onClick={() => setOpenDropdown(openDropdown === 'status' ? null : 'status')}
+              className={`w-full flex items-center justify-between pl-3 pr-4 py-2.5 rounded-xl bg-slate-900/40 hover:bg-slate-900/60 transition-all text-sm border focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${openDropdown === 'status' ? 'border-indigo-500/50 text-indigo-300' : 'border-transparent text-slate-300'}`}
+            >
+              <div className="flex items-center gap-2 truncate">
+                <Activity className={`h-4 w-4 shrink-0 ${status !== 'Todos' ? 'text-indigo-400' : 'text-slate-500'}`} />
+                <span className="truncate">
+                  {status}
+                </span>
+              </div>
+              <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${openDropdown === 'status' ? 'rotate-180 text-indigo-400' : 'text-slate-500'}`} />
+            </button>
+
+            {openDropdown === 'status' && (
+              <div className="absolute top-full left-0 mt-2 w-full min-w-[180px] bg-slate-800 border border-slate-700/50 rounded-xl shadow-2xl z-50 py-2 backdrop-blur-xl">
+                <div className="max-h-60 overflow-y-auto custom-scrollbar px-2 grid grid-cols-1 gap-1">
+                  {['Todos', 'Vista', 'Guardada', 'Aplicada', 'Enviada'].map(opt => (
+                    <label 
+                      key={opt} 
+                      onClick={(e) => { e.preventDefault(); setStatus(opt); setOpenDropdown(null); }}
+                      className="flex items-center gap-3 px-3 py-2 hover:bg-slate-700/50 rounded-lg cursor-pointer transition-colors group"
+                    >
+                      <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors shrink-0 ${status === opt ? 'border-indigo-500 bg-indigo-500' : 'border-slate-500 bg-slate-900/50 group-hover:border-indigo-400'}`}>
+                        {status === opt && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      </div>
+                      <span className={`text-sm group-hover:text-slate-100 ${status === opt ? 'text-slate-200 font-medium' : 'text-slate-300'}`}>{opt}</span>
                     </label>
                   ))}
                 </div>

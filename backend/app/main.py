@@ -15,7 +15,8 @@ from app.analysis.api_adapter import run_profile_match
 from app.database.db import get_db, engine, Base, SessionLocal
 from app.models.job import JobModel
 from app.models.user import UserModel
-from app.routers import auth, admin
+from app.models.user_job_status import UserJobStatusModel
+from app.routers import auth, admin, job_status
 from app.services.cache_service import CacheService
 from app.services.matcher_service import MatcherService
 from app.utils.security import get_current_user, get_current_user_optional
@@ -39,6 +40,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(admin.router)
+app.include_router(job_status.router)
 
 # In-memory state for refresh status
 _STATE = {
@@ -135,7 +137,9 @@ def get_jobs(
     search: Optional[str] = None,
     modalities: Optional[str] = None,
     skills: Optional[str] = None,
-    current_user: Optional[UserModel] = Depends(get_current_user_optional)
+    status: Optional[str] = None,
+    current_user: Optional[UserModel] = Depends(get_current_user_optional),
+    db: Session = Depends(get_db)
 ):
     raw_jobs = []
     sources = ["epam", "softek", "accenture", "globant", "ibm", "greenhouse", "axity", "hcl"]
@@ -165,6 +169,13 @@ def get_jobs(
     mod_list = [m.strip().lower() for m in modalities.split(',')] if modalities else []
     skill_list = [s.strip().lower() for s in skills.split(',')] if skills else []
 
+    user_statuses = {}
+    if current_user:
+        statuses = db.query(UserJobStatusModel).filter(
+            UserJobStatusModel.user_id == current_user.id
+        ).all()
+        user_statuses = {s.job_id: s.status.value for s in statuses}
+
     for job in raw_jobs:
         title = job.get("title") or job.get("name", "N/A")
         
@@ -184,6 +195,21 @@ def get_jobs(
         if skill_list and not any(s in job_skills for s in skill_list):
             continue
 
+        # Status filter and attachment
+        job_url = job.get("url", "N/A")
+        job_status = user_statuses.get(job_url)
+
+        if status and status.upper() != "TODOS":
+            status_map = {
+                "VISTA": "VIEWED",
+                "GUARDADA": "SAVED",
+                "APLICADA": "APPLIED",
+                "ENVIADA": "SENT"
+            }
+            target_status = status_map.get(status.upper())
+            if job_status != target_status:
+                continue
+
         result = matcher.score(job, profile_config)
         
         if min_score is not None and result["score"] < min_score:
@@ -195,10 +221,11 @@ def get_jobs(
             "matches": result["matches"],
             "category_breakdown": result.get("category_breakdown", {}),
             "skills": job.get("skills", []),
-            "url": job.get("url", "N/A"),
+            "url": job_url,
             "company": job.get("company", "Desconocida"),
             "publication_date": job.get("publication_date"),
-            "modality": job.get("modality", "Unknown")
+            "modality": job.get("modality", "Unknown"),
+            "status": job_status
         })
         
     scored_jobs.sort(key=lambda x: x["score"], reverse=True)

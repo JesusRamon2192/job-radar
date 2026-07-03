@@ -1,13 +1,48 @@
-import React, { useState } from 'react';
-import { ExternalLink, Building, MapPin, Tag, Calendar, Search } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ExternalLink, Building, MapPin, Tag, Calendar, Search, Heart, CheckCircle2, Send, Eye, RotateCcw } from 'lucide-react';
 import type { Job } from '../api/jobs';
+import { useJobStatus } from '../hooks/useJobStatus';
 
 interface JobCardProps {
   job: Job;
 }
 
-export const JobCard: React.FC<JobCardProps> = ({ job }) => {
+export const JobCard: React.FC<JobCardProps> = ({ job: initialJob }) => {
   const [expanded, setExpanded] = useState(false);
+  const { job, updateStatus, resetStatus, error, clearError } = useJobStatus(initialJob);
+
+  useEffect(() => {
+    if (expanded && (!job.status || job.status !== 'VIEWED')) {
+      // Only set VIEWED if it has no other significant status
+      if (!job.status) {
+        updateStatus('VIEWED');
+      }
+    }
+  }, [expanded, job.status, updateStatus]);
+
+  useEffect(() => {
+    if (error) {
+      alert(error); // In a real app we would use a toast
+      clearError();
+    }
+  }, [error, clearError]);
+
+  const getStatusBadge = () => {
+    if (!job.status) return null;
+    
+    switch (job.status) {
+      case 'VIEWED':
+        return <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-700/50 text-slate-300 text-xs font-medium border border-slate-600/50"><Eye className="w-3.5 h-3.5" /> Vista</span>;
+      case 'SAVED':
+        return <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-yellow-500/10 text-yellow-500 text-xs font-medium border border-yellow-500/20"><Heart className="w-3.5 h-3.5 fill-current" /> Guardada</span>;
+      case 'APPLIED':
+        return <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-medium border border-blue-500/20"><CheckCircle2 className="w-3.5 h-3.5" /> Aplicada</span>;
+      case 'SENT':
+        return <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 text-emerald-400 text-xs font-medium border border-green-500/20"><Send className="w-3.5 h-3.5" /> Enviada</span>;
+      default:
+        return null;
+    }
+  };
 
   const getScoreClassification = (score: number) => {
     if (score >= 80) return { colorClass: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20', stars: '★★★★★', label: 'Excelente' };
@@ -134,12 +169,15 @@ export const JobCard: React.FC<JobCardProps> = ({ job }) => {
           </div>
         </div>
 
-        <div 
-          className={`flex items-center justify-center px-4 py-2.5 rounded-xl border ${scoreInfo.colorClass} job-score shrink-0 transition-colors`} 
-          data-mobile-tier={getScoreTierMobile(job.score)}
-          title={`${scoreInfo.label} coincidencia: ${job.score} pts`}
-        >
-          <span className="text-sm tracking-[0.15em] opacity-90 score-stars">{scoreInfo.stars}</span>
+        <div className="flex flex-col items-end gap-2 shrink-0">
+          {getStatusBadge()}
+          <div 
+            className={`flex items-center justify-center px-4 py-2.5 rounded-xl border ${scoreInfo.colorClass} job-score transition-colors`} 
+            data-mobile-tier={getScoreTierMobile(job.score)}
+            title={`${scoreInfo.label} coincidencia: ${job.score} pts`}
+          >
+            <span className="text-sm tracking-[0.15em] opacity-90 score-stars">{scoreInfo.stars}</span>
+          </div>
         </div>
       </div>
 
@@ -178,16 +216,47 @@ export const JobCard: React.FC<JobCardProps> = ({ job }) => {
           </div>
         </div>
 
-        <a 
-          href={job.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
-          className="shrink-0 flex items-center gap-1.5 px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-lg transition-colors text-sm font-medium view-job-btn"
-        >
-          <span className="view-job-text">View Job</span>
-          <ExternalLink className="w-4 h-4 view-job-icon" />
-        </a>
+        <div className="flex items-center gap-2 shrink-0">
+          <button 
+            onClick={(e) => { e.stopPropagation(); updateStatus(job.status === 'SAVED' ? 'VIEWED' : 'SAVED'); }}
+            className={`p-2 rounded-lg transition-colors border ${job.status === 'SAVED' ? 'bg-yellow-500/20 border-yellow-500/30 text-yellow-500' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-yellow-500 hover:border-yellow-500/50'}`}
+            title={job.status === 'SAVED' ? 'Desguardar' : 'Guardar'}
+          >
+            <Heart className={`w-4 h-4 ${job.status === 'SAVED' ? 'fill-current' : ''}`} />
+          </button>
+          
+          <button 
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              if (job.status !== 'APPLIED' && job.status !== 'SENT') {
+                if (window.confirm('¿Confirmas que ya aplicaste a esta vacante?')) {
+                  updateStatus('APPLIED'); 
+                }
+              }
+            }}
+            disabled={job.status === 'APPLIED' || job.status === 'SENT'}
+            className={`p-2 rounded-lg transition-colors border ${job.status === 'APPLIED' ? 'bg-blue-500/20 border-blue-500/30 text-blue-400' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-blue-400 hover:border-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed'}`}
+            title="Marcar como Aplicada"
+          >
+            <CheckCircle2 className="w-4 h-4" />
+          </button>
+
+          <a 
+            href={job.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (job.status !== 'SENT') {
+                updateStatus('SENT');
+              }
+            }}
+            className="flex items-center gap-1.5 px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-lg transition-colors text-sm font-medium view-job-btn"
+          >
+            <span className="view-job-text">View Job</span>
+            <ExternalLink className="w-4 h-4 view-job-icon" />
+          </a>
+        </div>
       </div>
 
       {expanded && (
@@ -227,6 +296,30 @@ export const JobCard: React.FC<JobCardProps> = ({ job }) => {
                </div>
             </div>
           )}
+
+           <div className="mt-6 pt-4 border-t border-slate-700/30 flex items-center justify-end gap-3">
+             <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  resetStatus();
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-slate-300 hover:bg-slate-800 rounded-lg transition-colors"
+             >
+                <RotateCcw className="w-3.5 h-3.5" />
+                Reiniciar historial
+             </button>
+             <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateStatus('SENT');
+                }}
+                disabled={job.status === 'SENT'}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-green-500/10 text-emerald-400 hover:bg-green-500/20 rounded-lg transition-colors border border-green-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+             >
+                <Send className="w-3.5 h-3.5" />
+                Marcar como Enviada
+             </button>
+           </div>
         </div>
       )}
     </div>
