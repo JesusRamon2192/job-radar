@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { updateJobStatus as apiUpdateJobStatus, resetJobStatus as apiResetJobStatus } from '../api/jobs';
 import type { Job } from '../api/jobs';
+import { AxiosError } from 'axios';
 
 export const useJobStatus = (initialJob: Job) => {
   const [job, setJob] = useState<Job>(initialJob);
@@ -43,7 +44,15 @@ export const useJobStatus = (initialJob: Job) => {
     } catch (err) {
       // Revert on error
       setJob(prev => ({ ...prev, status: previousStatus }));
-      setError("Error al actualizar el estado. Intenta de nuevo.");
+      
+      if (err instanceof AxiosError && err.response?.status === 401) {
+        localStorage.removeItem('token');
+        if (newStatus !== 'VIEWED') {
+          setError("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
+        }
+      } else {
+        setError("Error al actualizar el estado. Intenta de nuevo.");
+      }
       console.error(err);
     } finally {
       setIsUpdating(false);
@@ -69,7 +78,12 @@ export const useJobStatus = (initialJob: Job) => {
       await apiResetJobStatus(job.url);
     } catch (err) {
       setJob(prev => ({ ...prev, status: previousStatus }));
-      setError("Error al reiniciar el estado. Intenta de nuevo.");
+      if (err instanceof AxiosError && err.response?.status === 401) {
+        localStorage.removeItem('token');
+        setError("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
+      } else {
+        setError("Error al reiniciar el estado. Intenta de nuevo.");
+      }
       console.error(err);
     } finally {
       setIsUpdating(false);
