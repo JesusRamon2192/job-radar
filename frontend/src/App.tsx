@@ -25,6 +25,7 @@ function App() {
   const [sortBy, setSortBy] = useState<'score' | 'date' | 'title'>('score');
   const [modalities, setModalities] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
+  const [status, setStatus] = useState<string>('Todos');
 
   // Available options
   const [availableCompanies, setAvailableCompanies] = useState<string[]>([]);
@@ -39,7 +40,7 @@ function App() {
   const loadJobs = async () => {
     try {
       setLoading(true);
-      const data = await fetchJobs(company || undefined, minScore, search || undefined, modalities, skills);
+      const data = await fetchJobs(company || undefined, minScore, search || undefined, modalities, skills, status);
       setJobs(data.jobs);
       setLastUpdated(data.last_updated);
       setIsRefreshing(data.is_refreshing);
@@ -63,12 +64,12 @@ function App() {
       interval = window.setInterval(loadJobs, 5000);
     }
     return () => clearInterval(interval);
-  }, [isRefreshing, company, minScore, search, modalities, skills]);
+  }, [isRefreshing, company, minScore, search, modalities, skills, status]);
 
   // Reset pagination on filter change
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, company, minScore, sortBy, modalities, skills]);
+  }, [search, company, minScore, sortBy, modalities, skills, status]);
 
   const sortedJobs = [...jobs].sort((a, b) => {
     if (sortBy === 'score') return b.score - a.score;
@@ -125,6 +126,7 @@ function App() {
             availableModalities={availableModalities}
             skills={skills} setSkills={setSkills}
             availableSkills={availableSkills}
+            status={status} setStatus={setStatus}
           />
 
           {loading && jobs.length === 0 ? (

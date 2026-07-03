@@ -1,0 +1,201 @@
+{
+  "jobSearchResult": [
+    {
+      "response": {
+        "unifiedStandardEnd": "7/18/26",
+        "supportedLocales": [
+          "en_US"
+        ],
+        "custprimecity": "Guadalajara",
+        "unifiedUrlTitle": "Salesforce-Apex-Senior-Technical-Lead-lightning-framework",
+        "unifiedStandardStart": "6/18/26",
+        "currency": [
+          "MXN"
+        ],
+        "id": "124602",
+        "unifiedStandardTitle": "Salesforce Apex Senior Technical Lead - lightning framework",
+        "custCountryRegion": [
+          "Mexico"
+        ],
+        "urlTitle": "Salesforce-Apex-Senior-Technical-Lead-lightning-framework"
+      }
+    },
+    {
+      "response": {
+        "unifiedStandardEnd": "7/18/26",
+        "supportedLocales": [
+          "en_US"
+        ],
+        "custprimecity": "Guadalajara",
+        "unifiedUrlTitle": "Salesforce-Apex-Technical-Lead-lightning-framework",
+        "unifiedStandardStart": "6/18/26",
+        "currency": [
+          "MXN"
+        ],
+        "id": "124600",
+        "unifiedStandardTitle": "Salesforce Apex Technical Lead - lightning framework",
+        "custCountryRegion": [
+          "Mexico"
+        ],
+        "urlTitle": "Salesforce-Apex-Technical-Lead-lightning-framework"
+      }
+    },
+    {
+      "response": {
+        "unifiedStandardEnd": "7/18/26",
+        "supportedLocales": [
+          "en_US"
+        ],
+        "custprimecity": "Guadalajara",
+        "unifiedUrlTitle": "Senior-Developer-Java%2C-Spring-Boot%2C-AWS%2C-Docker",
+        "unifiedStandardStart": "6/18/26",
+        "currency": [
+          "MXN"
+        ],
+        "id": "124828",
+        "unifiedStandardTitle": "Senior Developer - Java, Spring Boot, AWS, Docker",
+        "custCountryRegion": [
+          "Mexico"
+        ],
+        "urlTitle": "Senior-Developer-Java%2C-Spring-Boot%2C-AWS%2C-Docker"
+      }
+    },
+    {
+      "response": {
+        "supportedLocales": [
+          "en_US"
+        ],
+        "custprimecity": "Others",
+        "unifiedUrlTitle": "Front-End-Engineer-Support",
+        "unifiedStandardStart": "3/20/26",
+        "currency": [
+          "MXN"
+        ],
+        "id": "87169",
+        "unifiedStandardTitle": "Front End Engineer Support",
+        "custCountryRegion": [
+          "Mexico"
+        ],
+        "urlTitle": "Front-End-Engineer-Support"
+      }
+    },
+    {
+      "response": {
+        "unifiedStandardEnd": "7/18/26",
+        "supportedLocales": [
+          "en_US"
+        ],
+        "custprimecity": "Guadalajara",
+        "unifiedUrlTitle": "Sr-Analyst",
+        "unifiedStandardStart": "6/18/26",
+        "currency": [
+          "MXN"
+        ],
+        "id": "58906",
+        "unifiedStandardTitle": "Sr Analyst",
+        "custCountryRegion": [
+          "Mexico"
+        ],
+        "urlTitle": "Sr-Analyst"
+      }
+    },
+    {
+      "response": {
+        "unifiedStandardEnd": "7/4/26",
+        "supportedLocales": [
+          "en_US"
+        ],
+        "custprimecity": "Others",
+        "unifiedUrlTitle": "Senior-Technical-Lead",
+        "unifiedStandardStart": "5/28/26",
+        "currency": [
+          "MXN"
+        ],
+        "id": "91307",
+        "unifiedStandardTitle": "Senior Technical Lead",
+        "custCountryRegion": [
+          "Mexico"
+        ],
+        "urlTitle": "Senior-Technical-Lead"
+      }
+    },
+    {
+      "response": {
+        "supportedLocales": [
+          "en_US"
+        ],
+        "custprimecity": "Chihuahua",
+        "unifiedUrlTitle": "Design-Lead-MDR%2C-510%28k%29%2C-DHF-Remediation",
+        "unifiedStandardStart": "5/21/26",
+        "currency": [
+          "MXN"
+        ],
+        "id": "99909",
+        "unifiedStandardTitle": "Design Lead - MDR, 510(k), DHF Remediation",
+        "custCountryRegion": [
+          "Mexico"
+        ],
+        "urlTitle": "Design-Lead-MDR%2C-510%28k%29%2C-DHF-Remediation"
+      }
+    },
+    {
+      "response": {
+        "supportedLocales": [
+          "en_US"
+        ],
+        "custprimecity": "Sao Paulo",
+        "unifiedUrlTitle": "Service-Delivery-Manager-%28DPO%29",
+        "unifiedStandardStart": "6/18/26",
+        "currency": [
+          "BRL"
+        ],
+        "id": "124221",
+        "unifiedStandardTitle": "Service Delivery Manager (DPO)",
+        "custCountryRegion": [
+          "Brazil"
+        ],
+        "urlTitle": "Service-Delivery-Manager-%28DPO%29"
+      }
+    },
+    {
+      "response": {
+        "unifiedStandardEnd": "7/4/26",
+        "supportedLocales": [
+          "en_US"
+        ],
+        "custprimecity": "Juarez",
+        "unifiedUrlTitle": "Senior-Design-Lead-Component-engineering%2C-DFM",
+        "unifiedStandardStart": "5/22/26",
+        "currency": [
+          "MXN"
+        ],
+        "id": "93684",
+        "unifiedStandardTitle": "Senior Design Lead - Component engineering, DFM",
+        "custCountryRegion": [
+          "Mexico"
+        ],
+        "urlTitle": "Senior-Design-Lead-Component-engineering%2C-DFM"
+      }
+    },
+    {
+      "response": {
+        "supportedLocales": [
+          "en_US"
+        ],
+        "custprimecity": "Others",
+        "unifiedUrlTitle": "Senior-Analyst-BillingInvoicing",
+        "unifiedStandardStart": "4/6/26",
+        "currency": [
+          "MXN"
+        ],
+        "id": "93970",
+        "unifiedStandardTitle": "Senior Analyst  -  Billing/Invoicing",
+        "custCountryRegion": [
+          "Mexico"
+        ],
+        "urlTitle": "Senior-Analyst-BillingInvoicing"
+      }
+    }
+  ],
+  "totalJobs": 178
+}

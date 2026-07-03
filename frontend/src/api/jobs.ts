@@ -13,6 +13,7 @@ export interface Job {
   publication_date?: string;
   modality?: string;
   created_at?: string;
+  status?: 'VIEWED' | 'SAVED' | 'APPLIED' | 'SENT';
 }
 
 export interface JobsResponse {
@@ -27,7 +28,8 @@ export const fetchJobs = async (
   minScore?: number, 
   search?: string,
   modalities?: string[],
-  skills?: string[]
+  skills?: string[],
+  status?: string
 ): Promise<JobsResponse> => {
   const params = new URLSearchParams();
   if (company) params.append('company', company);
@@ -35,6 +37,7 @@ export const fetchJobs = async (
   if (search) params.append('search', search);
   if (modalities && modalities.length > 0) params.append('modalities', modalities.join(','));
   if (skills && skills.length > 0) params.append('skills', skills.join(','));
+  if (status && status !== 'Todos') params.append('status', status);
 
   const response = await axios.get(`${API_URL}/jobs`, { params });
   return response.data;
@@ -48,4 +51,20 @@ export const fetchTopJobs = async (limit: number = 10): Promise<{jobs: Job[]}> =
 export const refreshJobs = async (): Promise<{status: string, message: string}> => {
   const response = await axios.post(`${API_URL}/refresh`);
   return response.data;
+};
+
+export interface JobStatusResponse {
+  job_id: string;
+  status: 'VIEWED' | 'SAVED' | 'APPLIED' | 'SENT';
+  created_at: string;
+  updated_at?: string;
+}
+
+export const updateJobStatus = async (job_id: string, status: 'VIEWED' | 'SAVED' | 'APPLIED' | 'SENT'): Promise<JobStatusResponse> => {
+  const response = await axios.post(`${API_URL}/jobs/status`, { job_id, status });
+  return response.data;
+};
+
+export const resetJobStatus = async (job_id: string): Promise<void> => {
+  await axios.delete(`${API_URL}/jobs/status`, { params: { job_id } });
 };
