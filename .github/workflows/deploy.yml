@@ -19,3 +19,6 @@ jobs:
           git pull origin main
           docker compose down --remove-orphans
           docker compose up --build -d
+          # Wait a few seconds for the db to be ready, then run migrations
+          sleep 10
+          docker compose exec -T backend alembic upgrade head
