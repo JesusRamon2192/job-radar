@@ -64,8 +64,8 @@ def refresh_jobs_task():
 
 @app.on_event("startup")
 async def startup_event():
-    # Create tables
-    Base.metadata.create_all(bind=engine)
+    # Tablas manejadas por Alembic
+    # Base.metadata.create_all(bind=engine)
     
     # Schedule daily job
     scheduler.add_job(
