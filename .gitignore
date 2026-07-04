@@ -184,3 +184,4 @@ backend/test_*.py
 !backend/test_email.py
 todo.md
 unit-test.md
+troubleshooting-state.md
