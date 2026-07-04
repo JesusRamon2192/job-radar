@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ExternalLink, Building, MapPin, Tag, Calendar, Search, Heart, CheckCircle2, Send, Eye, RotateCcw } from 'lucide-react';
+import { ExternalLink, Building, MapPin, Tag, Calendar, Search, Heart, CheckCircle2, Eye } from 'lucide-react';
 import type { Job } from '../api/jobs';
 import { useJobStatus } from '../hooks/useJobStatus';
 
@@ -37,8 +37,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job: initialJob }) => {
         return <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-yellow-500/10 text-yellow-500 text-xs font-medium border border-yellow-500/20"><Heart className="w-3.5 h-3.5 fill-current" /> Guardada</span>;
       case 'APPLIED':
         return <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-medium border border-blue-500/20"><CheckCircle2 className="w-3.5 h-3.5" /> Aplicada</span>;
-      case 'SENT':
-        return <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 text-emerald-400 text-xs font-medium border border-green-500/20"><Send className="w-3.5 h-3.5" /> Enviada</span>;
+
       default:
         return null;
     }
@@ -218,8 +217,20 @@ export const JobCard: React.FC<JobCardProps> = ({ job: initialJob }) => {
 
         <div className="flex items-center gap-2 shrink-0">
           <button 
-            onClick={(e) => { e.stopPropagation(); updateStatus(job.status === 'SAVED' ? 'VIEWED' : 'SAVED'); }}
-            className={`p-2 rounded-lg transition-colors border ${job.status === 'SAVED' ? 'bg-yellow-500/20 border-yellow-500/30 text-yellow-500' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-yellow-500 hover:border-yellow-500/50'}`}
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              if (job.status === 'SAVED') {
+                resetStatus();
+              } else {
+                updateStatus('SAVED');
+              }
+            }}
+            disabled={job.status === 'SENT'}
+            className={`p-2 rounded-lg transition-colors border ${
+              job.status === 'SAVED' 
+                ? 'bg-yellow-500/20 border-yellow-500/30 text-yellow-500' 
+                : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-yellow-500 hover:border-yellow-500/50'
+            } disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-slate-400 disabled:hover:border-slate-700 disabled:bg-slate-800`}
             title={job.status === 'SAVED' ? 'Desguardar' : 'Guardar'}
           >
             <Heart className={`w-4 h-4 ${job.status === 'SAVED' ? 'fill-current' : ''}`} />
@@ -247,8 +258,8 @@ export const JobCard: React.FC<JobCardProps> = ({ job: initialJob }) => {
             rel="noopener noreferrer"
             onClick={(e) => {
               e.stopPropagation();
-              if (job.status !== 'SENT') {
-                updateStatus('SENT');
+              if (!job.status) {
+                updateStatus('VIEWED');
               }
             }}
             className="flex items-center gap-1.5 px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-lg transition-colors text-sm font-medium view-job-btn"
@@ -297,29 +308,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job: initialJob }) => {
             </div>
           )}
 
-           <div className="mt-6 pt-4 border-t border-slate-700/30 flex items-center justify-end gap-3">
-             <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  resetStatus();
-                }}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-slate-300 hover:bg-slate-800 rounded-lg transition-colors"
-             >
-                <RotateCcw className="w-3.5 h-3.5" />
-                Reiniciar historial
-             </button>
-             <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  updateStatus('SENT');
-                }}
-                disabled={job.status === 'SENT'}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-green-500/10 text-emerald-400 hover:bg-green-500/20 rounded-lg transition-colors border border-green-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
-             >
-                <Send className="w-3.5 h-3.5" />
-                Marcar como Enviada
-             </button>
-           </div>
+
         </div>
       )}
     </div>
