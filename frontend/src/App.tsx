@@ -10,8 +10,10 @@ import { Pagination } from './components/Pagination';
 import { fetchJobs } from './api/jobs';
 import type { Job } from './api/jobs';
 import { AdminDashboard } from './components/AdminDashboard';
+import { useAuth } from './context/AuthContext';
 
 function App() {
+  const { token } = useAuth();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -64,7 +66,7 @@ function App() {
       interval = window.setInterval(loadJobs, 5000);
     }
     return () => clearInterval(interval);
-  }, [isRefreshing, company, minScore, search, modalities, skills, status]);
+  }, [isRefreshing, company, minScore, search, modalities, skills, status, token]);
 
   // Reset pagination on filter change
   useEffect(() => {
