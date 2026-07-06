@@ -99,6 +99,10 @@ def login_access_token(db: Session = Depends(get_db), form_data: OAuth2PasswordR
 class ProfileUpdate(BaseModel):
     profile_config: Dict[str, Any]
 
+class ChangePassword(BaseModel):
+    current_password: str
+    new_password: str
+
 @router.get("/me", response_model=UserResponse)
 def read_current_user(current_user: UserModel = Depends(get_current_user)):
     return current_user
@@ -113,3 +117,16 @@ def update_current_user_profile(
     db.commit()
     db.refresh(current_user)
     return current_user
+
+@router.put("/change-password")
+def change_password(
+    password_data: ChangePassword,
+    current_user: UserModel = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    if not verify_password(password_data.current_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Contraseña actual incorrecta")
+        
+    current_user.hashed_password = get_password_hash(password_data.new_password)
+    db.commit()
+    return {"message": "Contraseña actualizada correctamente"}

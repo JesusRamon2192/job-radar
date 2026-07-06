@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Radar, Activity, User, LogOut, Clock } from 'lucide-react';
+import { Radar, Activity, User, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AuthModal } from './AuthModal';
 import { SupportModal } from './SupportModal';
+import { UserDropdown } from './UserDropdown';
+import { ProfileModal } from './ProfileModal';
 
 interface HeaderProps {
   lastUpdated: string | null;
@@ -11,10 +13,13 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ lastUpdated, onAnalyzeScore, onAdmin }) => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
   const [authTab, setAuthTab] = useState<'login' | 'register'>('login');
+  
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [profileTab, setProfileTab] = useState<'account' | 'radar' | 'preferences'>('account');
 
   const openAuth = (tab: 'login' | 'register') => {
     setAuthTab(tab);
@@ -23,7 +28,7 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, onAnalyzeScore, onA
 
   return (
     <>
-      <header className="dev-radar-header sticky top-0 z-50 w-full border-b border-slate-800 bg-slate-900/80 backdrop-blur-md">
+      <header className="dev-radar-header sticky top-0 z-[100] w-full border-b border-slate-800 bg-slate-900/80 backdrop-blur-md">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between header-content">
           <div className="flex items-center gap-2 logo-container cursor-pointer" onClick={() => onAnalyzeScore && onAnalyzeScore()}>
             <div className="bg-indigo-500/20 p-2 rounded-xl text-indigo-400 logo-icon">
@@ -74,19 +79,10 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, onAnalyzeScore, onA
             <div className="h-6 w-px bg-slate-700 hidden sm:block"></div>
 
             {user ? (
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 text-sm text-slate-300 bg-slate-800/50 border border-slate-700/50 px-3 py-1.5 rounded-full">
-                  <User className="w-4 h-4 text-indigo-400" />
-                  <span className="hidden sm:inline">{user.email.split('@')[0]}</span>
-                </div>
-                <button
-                  onClick={logout}
-                  className="p-2 text-slate-400 hover:text-rose-400 transition-colors"
-                  title="Cerrar Sesión"
-                >
-                  <LogOut className="w-5 h-5" />
-                </button>
-              </div>
+              <UserDropdown onOpenProfile={(tab) => {
+                setProfileTab(tab);
+                setIsProfileModalOpen(true);
+              }} />
             ) : (
               <div className="flex items-center gap-2">
                 <button
@@ -116,6 +112,12 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, onAnalyzeScore, onA
       <SupportModal 
         isOpen={isSupportModalOpen}
         onClose={() => setIsSupportModalOpen(false)}
+      />
+
+      <ProfileModal 
+        isOpen={isProfileModalOpen} 
+        onClose={() => setIsProfileModalOpen(false)} 
+        defaultTab={profileTab} 
       />
     </>
   );
