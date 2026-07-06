@@ -38,3 +38,11 @@ export const updateProfileConfig = async (profileConfig: Record<string, any>): P
   const response = await axios.put(`${API_URL}/api/auth/me`, { profile_config: profileConfig });
   return response.data;
 };
+
+export const changePassword = async (currentPassword: string, newPassword: string): Promise<{message: string}> => {
+  const response = await axios.put(`${API_URL}/api/auth/change-password`, {
+    current_password: currentPassword,
+    new_password: newPassword
+  });
+  return response.data;
+};
