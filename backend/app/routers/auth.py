@@ -63,6 +63,10 @@ def register_user(user_in: UserCreate, db: Session = Depends(get_db)):
             "Backend": 85,
             "Observability": 70,
             "Frontend": 85
+        },
+        "mailing_preferences": {
+            "enabled": True,
+            "keywords_include": []
         }
     }
     

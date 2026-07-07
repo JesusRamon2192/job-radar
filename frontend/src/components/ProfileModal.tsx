@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Sliders, Settings, Save, Shield } from 'lucide-react';
+import { X, User, Sliders, Settings, Save, Shield, Mail } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { updateProfileConfig, changePassword } from '../api/auth';
 
@@ -38,6 +38,14 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, def
   const [isSavingPassword, setIsSavingPassword] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
+  // Mailing Preferences State
+  const [mailingPreferences, setMailingPreferences] = useState<{ enabled: boolean; keywords_include: string[] }>({
+    enabled: true,
+    keywords_include: []
+  });
+  const [newKeyword, setNewKeyword] = useState('');
+  const [isSavingMailing, setIsSavingMailing] = useState(false);
+
   useEffect(() => {
     if (isOpen) {
       setActiveTab(defaultTab);
@@ -59,6 +67,14 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, def
           city: user.profile_config.personal_data.city || '',
           title: user.profile_config.personal_data.title || '',
           linkedin: user.profile_config.personal_data.linkedin || '',
+        });
+      }
+
+      // Initialize mailing preferences
+      if (user?.profile_config?.mailing_preferences) {
+        setMailingPreferences({
+          enabled: user.profile_config.mailing_preferences.enabled ?? true,
+          keywords_include: user.profile_config.mailing_preferences.keywords_include || []
         });
       }
     }
@@ -142,6 +158,46 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, def
     } finally {
       setIsSavingPassword(false);
     }
+  };
+
+  const handleSaveMailingPreferences = async () => {
+    setIsSavingMailing(true);
+    setSaveMessage(null);
+    try {
+      const newConfig = {
+        ...user.profile_config,
+        mailing_preferences: mailingPreferences
+      };
+      const updatedUser = await updateProfileConfig(newConfig);
+      updateUserContext(updatedUser);
+      setSaveMessage({ type: 'success', text: 'Preferencias de correo guardadas correctamente.' });
+      setTimeout(() => setSaveMessage(null), 3000);
+    } catch (error) {
+      console.error("Error saving mailing preferences", error);
+      setSaveMessage({ type: 'error', text: 'Error al actualizar las preferencias de correo.' });
+    } finally {
+      setIsSavingMailing(false);
+    }
+  };
+
+  const addKeyword = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && newKeyword.trim() !== '') {
+      e.preventDefault();
+      if (!mailingPreferences.keywords_include.includes(newKeyword.trim())) {
+        setMailingPreferences(prev => ({
+          ...prev,
+          keywords_include: [...prev.keywords_include, newKeyword.trim()]
+        }));
+      }
+      setNewKeyword('');
+    }
+  };
+
+  const removeKeyword = (keywordToRemove: string) => {
+    setMailingPreferences(prev => ({
+      ...prev,
+      keywords_include: prev.keywords_include.filter(k => k !== keywordToRemove)
+    }));
   };
 
   return (
@@ -417,6 +473,75 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, def
                     >
                       {isSavingPassword ? 'Actualizando...' : 'Actualizar Contraseña'}
                     </button>
+                  </div>
+                </div>
+
+                {/* Mailing Preferences */}
+                <div className="bg-slate-800/20 border border-slate-700/50 rounded-2xl p-6">
+                  <div className="flex items-center gap-3 mb-1">
+                    <Mail className="w-5 h-5 text-indigo-400" />
+                    <h3 className="text-lg font-medium text-white">Notificaciones de Correo</h3>
+                  </div>
+                  <p className="text-sm text-slate-400 mb-6">Configura las alertas diarias (8:00 AM) de nuevas vacantes.</p>
+                  
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-700/50">
+                      <div>
+                        <p className="text-sm font-medium text-white">Recibir alertas diarias</p>
+                        <p className="text-xs text-slate-400">Si lo desactivas, no recibirás correos de vacantes.</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer"
+                          checked={mailingPreferences.enabled}
+                          onChange={(e) => setMailingPreferences({...mailingPreferences, enabled: e.target.checked})}
+                        />
+                        <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-500"></div>
+                      </label>
+                    </div>
+
+                    <div className={`transition-opacity duration-300 ${mailingPreferences.enabled ? 'opacity-100' : 'opacity-50 pointer-events-none'}`}>
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                        Palabras Clave (Keywords)
+                      </label>
+                      <p className="text-xs text-slate-400 mb-3">
+                        Agrega palabras clave para recibir SOLO vacantes que las contengan (ej. Python, React, Cloud). Si la lista está vacía, recibirás todas las vacantes. Presiona Enter para agregar.
+                      </p>
+                      
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {mailingPreferences.keywords_include.map((keyword, idx) => (
+                          <span key={idx} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/20 text-indigo-300 text-sm font-medium rounded-lg border border-indigo-500/30">
+                            {keyword}
+                            <button 
+                              onClick={() => removeKeyword(keyword)}
+                              className="p-0.5 hover:bg-indigo-500/30 rounded-md transition-colors"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+
+                      <input 
+                        type="text" 
+                        value={newKeyword}
+                        onChange={(e) => setNewKeyword(e.target.value)}
+                        onKeyDown={addKeyword}
+                        placeholder="Escribe una palabra y presiona Enter"
+                        className="w-full max-w-md bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+
+                    <div className="flex justify-start pt-2">
+                      <button
+                        onClick={handleSaveMailingPreferences}
+                        disabled={isSavingMailing}
+                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-xl transition-all disabled:opacity-50"
+                      >
+                        {isSavingMailing ? 'Guardando...' : 'Guardar Preferencias'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -101,6 +101,10 @@ async def startup_event():
                     "Backend": 85,
                     "Observability": 70,
                     "Frontend": 85
+                },
+                "mailing_preferences": {
+                    "enabled": True,
+                    "keywords_include": []
                 }
             }
             new_user = UserModel(
