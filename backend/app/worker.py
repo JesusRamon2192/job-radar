@@ -58,12 +58,41 @@ def send_user_email_task(user_id: int):
         if not user:
             return
 
+        profile_config = user.profile_config or {}
+        mailing_prefs = profile_config.get("mailing_preferences", {})
+        
+        # Check if mailing is enabled (default is True if not explicitly set)
+        if not mailing_prefs.get("enabled", True):
+            return
+
         # Fetch jobs from the last 24 hours
         yesterday = datetime.utcnow() - timedelta(days=1)
         new_jobs = db.query(JobModel).filter(JobModel.created_at >= yesterday).all()
 
         if new_jobs:
-            email_service = EmailService()
-            email_service.send_daily_jobs_email(user, new_jobs)
+            # Filter jobs by keywords if they exist
+            keywords = mailing_prefs.get("keywords_include", [])
+            if keywords:
+                filtered_jobs = []
+                for job in new_jobs:
+                    # check if any keyword is in title or skills
+                    title_lower = (job.title or "").lower()
+                    skills_lower = [s.lower() for s in (job.skills or [])]
+                    
+                    match_found = False
+                    for kw in keywords:
+                        kw_lower = kw.lower()
+                        if kw_lower in title_lower or any(kw_lower in s for s in skills_lower):
+                            match_found = True
+                            break
+                    
+                    if match_found:
+                        filtered_jobs.append(job)
+                
+                new_jobs = filtered_jobs
+
+            if new_jobs:
+                email_service = EmailService()
+                email_service.send_daily_jobs_email(user, new_jobs)
     finally:
         db.close()
