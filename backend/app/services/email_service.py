@@ -17,6 +17,7 @@ class EmailService:
         self.smtp_port = 587
         self.sender_email = os.environ.get("SMTP_USER", "")
         self.sender_password = os.environ.get("SMTP_PASSWORD", "")
+        self.email_environment = os.environ.get("EMAIL_ENVIRONMENT", "UNKNOWN")
 
     def send_daily_jobs_email(self, user: UserModel, jobs: List[JobModel]):
         if not jobs:
@@ -75,10 +76,13 @@ class EmailService:
               </ul>
               <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #a0aec0;">
                 <p>Estás recibiendo este correo porque eres un usuario registrado en DevLATAM.</p>
+                <p style="margin-top: 10px; display: inline-block; padding: 4px 8px; background-color: #edf2f7; color: #4a5568; border-radius: 4px; border: 1px solid #e2e8f0;">
+                  Este correo fue enviado desde el ambiente: <strong>{{ env }}</strong>
+                </p>
               </div>
             </div>
           </body>
         </html>
         """
         template = Template(template_str)
-        return template.render(user=user, jobs=jobs)
+        return template.render(user=user, jobs=jobs, env=self.email_environment)
