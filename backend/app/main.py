@@ -146,7 +146,7 @@ def get_jobs(
     db: Session = Depends(get_db)
 ):
     raw_jobs = []
-    sources = ["epam", "softek", "accenture", "globant", "ibm", "greenhouse", "axity", "hcl"]
+    sources = ["epam", "softek", "accenture", "globant", "ibm", "greenhouse", "axity", "hcl", "tech_mahindra"]
     for source in sources:
         jobs = CacheService.get_raw_jobs(source)
         if jobs:

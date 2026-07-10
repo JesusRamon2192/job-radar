@@ -11,6 +11,7 @@ import { fetchJobs } from './api/jobs';
 import type { Job } from './api/jobs';
 import { AdminDashboard } from './components/AdminDashboard';
 import { useAuth } from './context/AuthContext';
+import { ResetPassword } from './components/ResetPassword';
 
 function App() {
   const { token } = useAuth();
@@ -19,6 +20,9 @@ function App() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState<'dashboard' | 'score' | 'admin'>('dashboard');
+  
+  const searchParams = new URLSearchParams(window.location.search);
+  const [resetToken, setResetToken] = useState<string | null>(searchParams.get('token'));
 
   // Filters state
   const [search, setSearch] = useState('');
@@ -103,6 +107,16 @@ function App() {
         onAnalyzeScore={() => setCurrentView('score')}
         onAdmin={() => setCurrentView('admin')}
       />
+      
+      {resetToken && (
+        <ResetPassword 
+          token={resetToken} 
+          onSuccess={() => {
+            setResetToken(null);
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }} 
+        />
+      )}
       
       {currentView === 'admin' ? (
         <main className="container mx-auto px-4 mt-8 max-w-6xl min-[1600px]:max-w-[1536px]">

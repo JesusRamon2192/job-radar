@@ -12,8 +12,13 @@ from app.utils.security import (
     get_password_hash,
     create_access_token,
     get_current_user,
-    ACCESS_TOKEN_EXPIRE_MINUTES
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    create_reset_password_token,
+    verify_reset_password_token
 )
+from app.services.email_service import EmailService
+
+email_service = EmailService()
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -134,3 +139,42 @@ def change_password(
     current_user.hashed_password = get_password_hash(password_data.new_password)
     db.commit()
     return {"message": "Contraseña actualizada correctamente"}
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+@router.post("/forgot-password")
+def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    user = db.query(UserModel).filter(UserModel.email == request.email).first()
+    # We don't want to reveal if a user exists or not for security, 
+    # so we return a success message regardless
+    if user:
+        token = create_reset_password_token(user.email)
+        email_service.send_reset_password_email(user.email, token)
+    
+    return {"message": "Si tu correo está registrado, recibirás un enlace para restablecer tu contraseña."}
+
+@router.post("/reset-password")
+def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
+    email = verify_reset_password_token(request.token)
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El token es inválido o ha expirado."
+        )
+        
+    user = db.query(UserModel).filter(UserModel.email == email).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Usuario no encontrado."
+        )
+        
+    user.hashed_password = get_password_hash(request.new_password)
+    db.commit()
+    
+    return {"message": "Contraseña restablecida correctamente."}

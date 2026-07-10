@@ -86,3 +86,65 @@ class EmailService:
         """
         template = Template(template_str)
         return template.render(user=user, jobs=jobs, env=self.email_environment)
+
+    def send_reset_password_email(self, email: str, token: str):
+        logger.info(f"Sending password reset email to {email}")
+        
+        frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3333")
+        reset_link = f"{frontend_url}/reset-password?token={token}"
+        
+        html_content = self._render_reset_password_template(email, reset_link)
+        
+        if not self.sender_email or not self.sender_password:
+            logger.warning("SMTP credentials are not set. Printing reset email to console instead.")
+            print(f"--- RESET PASSWORD EMAIL TO {email} ---")
+            print(html_content)
+            print(f"Link: {reset_link}")
+            print("-----------------------------------------")
+            return
+
+        message = MIMEMultipart("alternative")
+        message["Subject"] = "DevLATAM: Restablecer Contraseña"
+        message["From"] = f"DevLATAM <{self.sender_email}>"
+        message["To"] = email
+
+        part = MIMEText(html_content, "html")
+        message.attach(part)
+
+        try:
+            with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
+                server.starttls()
+                server.login(self.sender_email, self.sender_password)
+                server.sendmail(self.sender_email, email, message.as_string())
+            logger.info("Password reset email sent successfully!")
+        except Exception as e:
+            logger.error(f"Failed to send password reset email: {e}")
+
+    def _render_reset_password_template(self, email: str, reset_link: str) -> str:
+        template_str = """
+        <html>
+          <body style="font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+              <h2 style="color: #2b6cb0; text-align: center; margin-bottom: 20px;">Restablecer Contraseña</h2>
+              <p style="font-size: 16px; margin-bottom: 20px;">Hola {{ email }},</p>
+              <p style="font-size: 16px; margin-bottom: 30px;">Recibimos una solicitud para restablecer tu contraseña en DevLATAM. Haz clic en el botón de abajo para cambiar tu contraseña:</p>
+              
+              <div style="text-align: center; margin-bottom: 30px;">
+                <a href="{{ reset_link }}" style="display: inline-block; padding: 12px 24px; background-color: #3182ce; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">Restablecer mi contraseña</a>
+              </div>
+              
+              <p style="font-size: 14px; color: #718096; margin-bottom: 10px;">Este enlace expirará en 15 minutos.</p>
+              <p style="font-size: 14px; color: #718096; margin-bottom: 20px;">Si no solicitaste este cambio, puedes ignorar este correo y tu contraseña seguirá siendo la misma.</p>
+              
+              <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+              
+              <div style="font-size: 12px; color: #a0aec0; text-align: center;">
+                <p>DevLATAM</p>
+              </div>
+            </div>
+          </body>
+        </html>
+        """
+        template = Template(template_str)
+        return template.render(email=email, reset_link=reset_link)
+

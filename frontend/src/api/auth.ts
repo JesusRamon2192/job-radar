@@ -46,3 +46,16 @@ export const changePassword = async (currentPassword: string, newPassword: strin
   });
   return response.data;
 };
+
+export const forgotPassword = async (email: string): Promise<{message: string}> => {
+  const response = await axios.post(`${API_URL}/api/auth/forgot-password`, { email });
+  return response.data;
+};
+
+export const resetPassword = async (token: string, newPassword: string): Promise<{message: string}> => {
+  const response = await axios.post(`${API_URL}/api/auth/reset-password`, {
+    token,
+    new_password: newPassword
+  });
+  return response.data;
+};

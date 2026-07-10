@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Mail, Lock, UserPlus, LogIn, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { loginUser, registerUser } from '../api/auth';
+import { loginUser, registerUser, forgotPassword } from '../api/auth';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -10,11 +10,12 @@ interface AuthModalProps {
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTab = 'login' }) => {
-  const [tab, setTab] = useState<'login' | 'register'>(defaultTab);
+  const [tab, setTab] = useState<'login' | 'register' | 'forgot_password'>(defaultTab);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
 
@@ -23,6 +24,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTa
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
 
     try {
@@ -30,10 +32,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTa
         const data = await loginUser(email, password);
         login(data.access_token);
         onClose();
-      } else {
+      } else if (tab === 'register') {
         const data = await registerUser(email, password);
         login(data.access_token);
         onClose();
+      } else if (tab === 'forgot_password') {
+        const data = await forgotPassword(email);
+        setSuccess(data.message || 'Se ha enviado un correo con las instrucciones.');
       }
     } catch (err: any) {
       if (err.response && err.response.data && err.response.data.detail) {
@@ -57,9 +62,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTa
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500"></div>
         
         {/* Header Tabs */}
+        {tab !== 'forgot_password' && (
         <div className="flex border-b border-slate-800">
           <button
-            onClick={() => { setTab('login'); setError(''); }}
+            onClick={() => { setTab('login'); setError(''); setSuccess(''); }}
             className={`flex-1 py-4 text-sm font-medium transition-colors ${
               tab === 'login' 
                 ? 'text-indigo-400 bg-slate-800/50 border-b-2 border-indigo-500' 
@@ -72,7 +78,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTa
             </div>
           </button>
           <button
-            onClick={() => { setTab('register'); setError(''); }}
+            onClick={() => { setTab('register'); setError(''); setSuccess(''); }}
             className={`flex-1 py-4 text-sm font-medium transition-colors ${
               tab === 'register' 
                 ? 'text-purple-400 bg-slate-800/50 border-b-2 border-purple-500' 
@@ -85,6 +91,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTa
             </div>
           </button>
         </div>
+        )}
 
         <button 
           onClick={onClose}
@@ -96,18 +103,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTa
         {/* Form Body */}
         <div className="p-8">
           <h2 className="text-2xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">
-            {tab === 'login' ? 'Bienvenido de vuelta' : 'Únete a DevLATAM'}
+            {tab === 'login' ? 'Bienvenido de vuelta' : tab === 'forgot_password' ? 'Recuperar contraseña' : 'Únete a DevLATAM'}
           </h2>
           <p className="text-slate-400 text-sm mb-6">
             {tab === 'login' 
               ? 'Ingresa tus credenciales para acceder a tu radar.' 
-              : 'Configura tus habilidades y encuentra tu trabajo ideal.'}
+              : tab === 'forgot_password' 
+                ? 'Ingresa tu correo y te enviaremos un enlace para restablecerla.'
+                : 'Configura tus habilidades y encuentra tu trabajo ideal.'}
           </p>
 
           {error && (
             <div className="mb-6 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
               <p className="text-sm text-rose-200">{error}</p>
+            </div>
+          )}
+
+          {success && (
+            <div className="mb-6 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+              <p className="text-sm text-emerald-200">{success}</p>
             </div>
           )}
 
@@ -129,6 +145,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTa
               </div>
             </div>
 
+            {tab !== 'forgot_password' && (
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1">Contraseña</label>
               <div className="relative">
@@ -151,20 +168,43 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultTa
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
+              {tab === 'login' && (
+                <div className="mt-2 text-right">
+                  <button 
+                    type="button" 
+                    onClick={() => { setTab('forgot_password'); setError(''); setSuccess(''); }}
+                    className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </button>
+                </div>
+              )}
             </div>
+            )}
 
             <button
               type="submit"
               disabled={loading}
               className={`w-full flex items-center justify-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r ${
-                tab === 'login' ? 'from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400' : 'from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400'
+                tab === 'login' || tab === 'forgot_password' ? 'from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400' : 'from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400'
               } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-slate-900 transition-all ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : tab === 'login' ? 'Iniciar Sesión' : 'Registrarse'}
+              ) : tab === 'login' ? 'Iniciar Sesión' : tab === 'forgot_password' ? 'Enviar Enlace' : 'Registrarse'}
             </button>
           </form>
+          
+          {tab === 'forgot_password' && (
+            <div className="mt-6 text-center">
+              <button 
+                onClick={() => { setTab('login'); setError(''); setSuccess(''); }}
+                className="text-sm text-slate-400 hover:text-slate-200 transition-colors flex items-center justify-center gap-2 mx-auto"
+              >
+                Volver a Iniciar Sesión
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
