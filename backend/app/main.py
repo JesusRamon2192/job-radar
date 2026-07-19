@@ -16,7 +16,7 @@ from app.database.db import get_db, engine, Base, SessionLocal
 from app.models.job import JobModel
 from app.models.user import UserModel
 from app.models.user_job_status import UserJobStatusModel
-from app.routers import auth, admin, job_status
+from app.routers import auth, admin, job_status, market
 from app.services.cache_service import CacheService
 from app.services.matcher_service import MatcherService
 from app.utils.security import get_current_user, get_current_user_optional
@@ -41,6 +41,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(admin.router)
 app.include_router(job_status.router)
+app.include_router(market.router)
 
 # In-memory state for refresh status
 _STATE = {
@@ -146,7 +147,7 @@ def get_jobs(
     db: Session = Depends(get_db)
 ):
     raw_jobs = []
-    sources = ["epam", "softek", "accenture", "globant", "ibm", "greenhouse", "axity", "hcl"]
+    sources = ["epam", "softek", "accenture", "globant", "ibm", "greenhouse", "axity", "hcl", "tech_mahindra"]
     for source in sources:
         jobs = CacheService.get_raw_jobs(source)
         if jobs:

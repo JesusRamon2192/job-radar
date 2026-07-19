@@ -11,14 +11,21 @@ import { fetchJobs } from './api/jobs';
 import type { Job } from './api/jobs';
 import { AdminDashboard } from './components/AdminDashboard';
 import { useAuth } from './context/AuthContext';
+import { ResetPassword } from './components/ResetPassword';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import { MarketDashboard } from './pages/market/MarketDashboard';
+import { CompanyMarketDashboard } from './pages/market/CompanyMarketDashboard';
 
 function App() {
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [currentView, setCurrentView] = useState<'dashboard' | 'score' | 'admin'>('dashboard');
+  
+  const searchParams = new URLSearchParams(window.location.search);
+  const [resetToken, setResetToken] = useState<string | null>(searchParams.get('token'));
 
   // Filters state
   const [search, setSearch] = useState('');
@@ -100,65 +107,79 @@ function App() {
     <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-indigo-500/30 pb-20">
       <Header 
         lastUpdated={lastUpdated} 
-        onAnalyzeScore={() => setCurrentView('score')}
-        onAdmin={() => setCurrentView('admin')}
       />
       
-      {currentView === 'admin' ? (
-        <main className="container mx-auto px-4 mt-8 max-w-6xl min-[1600px]:max-w-[1536px]">
-          <AdminDashboard onBack={() => setCurrentView('dashboard')} />
-        </main>
-      ) : currentView === 'score' ? (
-        <main className="container mx-auto px-4 mt-8 max-w-6xl min-[1600px]:max-w-[1536px]">
-          <ScoreAnalysis onBack={() => setCurrentView('dashboard')} />
-        </main>
-      ) : (
-        <main className="container mx-auto px-4 mt-4 max-w-6xl min-[1600px]:max-w-[1536px]">
-          <DashboardStats jobs={jobs} />
-          
-          <RegistrationBanner />
-
-          <JobFilters 
-            search={search} setSearch={setSearch}
-            company={company} setCompany={setCompany}
-            minScore={minScore} setMinScore={setMinScore}
-            companies={availableCompanies}
-            sortBy={sortBy} setSortBy={setSortBy}
-            modalities={modalities} setModalities={setModalities}
-            availableModalities={availableModalities}
-            skills={skills} setSkills={setSkills}
-            availableSkills={availableSkills}
-            status={status} setStatus={setStatus}
-          />
-
-          {loading && jobs.length === 0 ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
-            </div>
-          ) : sortedJobs.length === 0 ? (
-            <div className="text-center py-20 text-slate-400 bg-slate-800/30 rounded-2xl border border-slate-700/50">
-              <p className="text-lg">No jobs found matching your criteria.</p>
-              <p className="text-sm mt-2">Try adjusting your filters or triggering a refresh.</p>
-            </div>
-          ) : (
-            <div ref={listRef} className="animate-fade-in">
-              <div className="grid grid-cols-1 lg:grid-cols-2 min-[1600px]:grid-cols-3 gap-4 items-start">
-                {paginatedJobs.map((job, idx) => (
-                  <div key={`${job.url}-${idx}`} className="animate-slide-up" style={{ animationDelay: `${idx * 50}ms`, animationFillMode: 'both' }}>
-                    <JobCard job={job} />
-                  </div>
-                ))}
-              </div>
-              
-              <Pagination 
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            </div>
-          )}
-        </main>
+      {resetToken && (
+        <ResetPassword 
+          token={resetToken} 
+          onSuccess={() => {
+            setResetToken(null);
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }} 
+        />
       )}
+      
+      <Routes>
+        <Route path="/admin" element={
+          <main className="container mx-auto px-4 mt-8 max-w-6xl min-[1600px]:max-w-[1536px]">
+            <AdminDashboard onBack={() => navigate('/')} />
+          </main>
+        } />
+        <Route path="/score" element={
+          <main className="container mx-auto px-4 mt-8 max-w-6xl min-[1600px]:max-w-[1536px]">
+            <ScoreAnalysis onBack={() => navigate('/')} />
+          </main>
+        } />
+        <Route path="/market" element={<MarketDashboard />} />
+        <Route path="/company/:id/market" element={<CompanyMarketDashboard />} />
+        <Route path="/" element={
+          <main className="container mx-auto px-4 mt-4 max-w-6xl min-[1600px]:max-w-[1536px]">
+            <DashboardStats jobs={jobs} />
+            
+            <RegistrationBanner />
+
+            <JobFilters 
+              search={search} setSearch={setSearch}
+              company={company} setCompany={setCompany}
+              minScore={minScore} setMinScore={setMinScore}
+              companies={availableCompanies}
+              sortBy={sortBy} setSortBy={setSortBy}
+              modalities={modalities} setModalities={setModalities}
+              availableModalities={availableModalities}
+              skills={skills} setSkills={setSkills}
+              availableSkills={availableSkills}
+              status={status} setStatus={setStatus}
+            />
+
+            {loading && jobs.length === 0 ? (
+              <div className="flex justify-center items-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+              </div>
+            ) : sortedJobs.length === 0 ? (
+              <div className="text-center py-20 text-slate-400 bg-slate-800/30 rounded-2xl border border-slate-700/50">
+                <p className="text-lg">No jobs found matching your criteria.</p>
+                <p className="text-sm mt-2">Try adjusting your filters or triggering a refresh.</p>
+              </div>
+            ) : (
+              <div ref={listRef} className="animate-fade-in">
+                <div className="grid grid-cols-1 lg:grid-cols-2 min-[1600px]:grid-cols-3 gap-4 items-start">
+                  {paginatedJobs.map((job, idx) => (
+                    <div key={`${job.url}-${idx}`} className="animate-slide-up" style={{ animationDelay: `${idx * 50}ms`, animationFillMode: 'both' }}>
+                      <JobCard job={job} />
+                    </div>
+                  ))}
+                </div>
+                
+                <Pagination 
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
+          </main>
+        } />
+      </Routes>
       
       <Footer />
     </div>

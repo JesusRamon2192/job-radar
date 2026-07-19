@@ -26,6 +26,7 @@ from app.database.db import Base
 from app.models.user import UserModel
 from app.models.job import JobModel
 from app.models.user_job_status import UserJobStatusModel
+from app.models.company_daily_stats import CompanyDailyStatsModel
 
 target_metadata = Base.metadata
 

@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import { Radar, Activity, User, Clock } from 'lucide-react';
+import { Radar, Activity, User, Clock, TrendingUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AuthModal } from './AuthModal';
 import { SupportModal } from './SupportModal';
 import { UserDropdown } from './UserDropdown';
 import { ProfileModal } from './ProfileModal';
+import { useNavigate, Link } from 'react-router-dom';
 
 interface HeaderProps {
   lastUpdated: string | null;
-  onAnalyzeScore?: () => void;
-  onAdmin?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ lastUpdated, onAnalyzeScore, onAdmin }) => {
+export const Header: React.FC<HeaderProps> = ({ lastUpdated }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
   const [authTab, setAuthTab] = useState<'login' | 'register'>('login');
@@ -30,14 +30,14 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, onAnalyzeScore, onA
     <>
       <header className="dev-radar-header sticky top-0 z-[100] w-full border-b border-slate-800 bg-slate-900/80 backdrop-blur-md">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between header-content">
-          <div className="flex items-center gap-2 logo-container cursor-pointer" onClick={() => onAnalyzeScore && onAnalyzeScore()}>
+          <Link to="/" className="flex items-center gap-2 logo-container cursor-pointer">
             <div className="bg-indigo-500/20 p-2 rounded-xl text-indigo-400 logo-icon">
               <Radar className="w-6 h-6" />
             </div>
             <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent logo-text">
               DevLATAM
             </h1>
-          </div>
+          </Link>
 
           <div className="flex items-center gap-4 sm:gap-6">
             {lastUpdated && lastUpdated !== 'Never' && !isNaN(new Date(lastUpdated).getTime()) && (
@@ -49,19 +49,25 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, onAnalyzeScore, onA
               </div>
             )}
             
-            {onAnalyzeScore && (
-              <button
-                onClick={onAnalyzeScore}
-                className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white text-sm font-medium rounded-xl transition-all shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 border border-indigo-400/20"
-              >
-                <Activity className="w-4 h-4" />
-                <span>Análisis de Score</span>
-              </button>
-            )}
+            <button
+              onClick={() => navigate('/score')}
+              className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white text-sm font-medium rounded-xl transition-all shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 border border-indigo-400/20"
+            >
+              <Activity className="w-4 h-4" />
+              <span>Análisis de Score</span>
+            </button>
+            
+            <button
+              onClick={() => navigate('/market')}
+              className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-800/80 hover:bg-slate-700/80 text-emerald-400 hover:text-emerald-300 text-sm font-medium rounded-xl transition-all border border-emerald-500/20 hover:border-emerald-500/40 hover:shadow-lg hover:shadow-emerald-500/10"
+            >
+              <TrendingUp className="w-4 h-4" />
+              <span>Mercado</span>
+            </button>
 
-            {user && (user.email === 'jesus.ramon2192@gmail.com' || user.is_admin) && onAdmin && (
+            {user && (user.email === 'jesus.ramon2192@gmail.com' || user.is_admin) && (
               <button
-                onClick={onAdmin}
+                onClick={() => navigate('/admin')}
                 className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-xl transition-all border border-slate-700"
               >
                 <User className="w-4 h-4" />
