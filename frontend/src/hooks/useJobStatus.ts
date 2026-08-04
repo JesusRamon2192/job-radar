@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { updateJobStatus as apiUpdateJobStatus, resetJobStatus as apiResetJobStatus } from '../api/jobs';
-import type { Job } from '../api/jobs';
+import type { Job, JobStatus } from '../api/jobs';
 import { AxiosError } from 'axios';
 
 export const useJobStatus = (initialJob: Job) => {
@@ -8,7 +8,7 @@ export const useJobStatus = (initialJob: Job) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const updateStatus = useCallback(async (newStatus: 'VIEWED' | 'SAVED' | 'APPLIED' | 'SENT') => {
+  const updateStatus = useCallback(async (newStatus: JobStatus) => {
     // Check if user is logged in
     const token = localStorage.getItem('token');
     if (!token) {
@@ -21,11 +21,7 @@ export const useJobStatus = (initialJob: Job) => {
     // If the job already has this status, don't update
     if (job.status === newStatus) return;
 
-    // Prevent downgrading from SENT
-    if (job.status === 'SENT') {
-      setError("No se puede cambiar el estado de una vacante enviada. Reinicia el estado primero.");
-      return;
-    }
+
     
     // VIEWED condition: "Si la vacante ya tiene otro estado, NO debe cambiar a Vista."
     if (newStatus === 'VIEWED' && job.status && job.status !== 'VIEWED') {

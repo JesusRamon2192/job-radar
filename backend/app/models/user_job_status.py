@@ -8,6 +8,10 @@ class JobStatusEnum(str, enum.Enum):
     SAVED = "SAVED"
     APPLIED = "APPLIED"
     SENT = "SENT"
+    INTERVIEWING = "INTERVIEWING"
+    OFFER = "OFFER"
+    REJECTED = "REJECTED"
+    ARCHIVED = "ARCHIVED"
 
 class UserJobStatusModel(Base):
     __tablename__ = "user_job_status"

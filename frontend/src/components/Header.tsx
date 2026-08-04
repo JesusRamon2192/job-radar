@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Radar, Activity, User, Clock, TrendingUp } from 'lucide-react';
+import { Radar, Activity, User, Clock, TrendingUp, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { AuthModal } from './AuthModal';
 import { SupportModal } from './SupportModal';
@@ -64,6 +64,16 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated }) => {
               <TrendingUp className="w-4 h-4" />
               <span>Mercado</span>
             </button>
+
+            {user && (
+              <button
+                onClick={() => navigate('/tracker')}
+                className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-800/80 hover:bg-slate-700/80 text-cyan-400 hover:text-cyan-300 text-sm font-medium rounded-xl transition-all border border-cyan-500/20 hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/10"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Tracker</span>
+              </button>
+            )}
 
             {user && (user.email === 'jesus.ramon2192@gmail.com' || user.is_admin) && (
               <button
