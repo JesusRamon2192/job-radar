@@ -38,6 +38,7 @@ services:
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - ENVIRONMENT=production
       - EMAIL_ENVIRONMENT=${EMAIL_ENVIRONMENT}
+      - CORS_ORIGINS=${CORS_ORIGINS}
     depends_on:
       db:
         condition: service_healthy

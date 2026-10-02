@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
 import asyncio
+import os
 from apscheduler.schedulers.background import BackgroundScheduler
 from zoneinfo import ZoneInfo
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -30,9 +31,10 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 scheduler = BackgroundScheduler()
 
 # Configure CORS for frontend
+_cors_origins = os.environ.get("CORS_ORIGINS", "")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify the frontend domain
+    allow_origins=[o.strip() for o in _cors_origins.split(",") if o.strip()],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

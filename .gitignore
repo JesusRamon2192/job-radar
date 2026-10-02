@@ -185,3 +185,4 @@ backend/test_*.py
 todo.md
 unit-test.md
 troubleshooting-state.md
+AGENTS.md
