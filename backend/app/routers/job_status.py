@@ -63,33 +63,8 @@ def update_job_status(
         UserJobStatusModel.job_id == status_update.job_id
     ).first()
 
-    # Priority mapping for validation
-    priority = {
-        JobStatusEnum.VIEWED: 1,
-        JobStatusEnum.SAVED: 2,
-        JobStatusEnum.APPLIED: 3,
-        JobStatusEnum.SENT: 4
-    }
-
     if existing_status:
-        current_priority = priority[existing_status.status]
-        new_priority = priority[status_update.status]
-        
-        # If new priority is lower or equal (except same status update, which does nothing), 
-        # it is not allowed unless it's a valid change like 'Saved' to 'Viewed'?
-        # Prompt: "Si posteriormente cambia a Aplicada o Enviada, deja de estar Guardada."
-        # Prompt: "Una vacante Enviada no puede volver a Aplicada, Guardada o Vista, excepto si el usuario decide reiniciar"
-        # Wait, if a user clicks "Guardar" on an "Aplicada", should it go back to Saved? Prompt says: 
-        # "Reemplaza cualquier estado anterior. Si ya estaba Enviada no debe permitir volver a Aplicada."
-        if current_priority == 4:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Cannot change status from SENT. Must reset first."
-            )
-            
-        # Allow any change up to 3 if not 4?
-        # Re-read rules:
-        # - Vista: If it has another state, do NOT change to Vista.
+        # Prevent downgrading to VIEWED if it's already in a higher state (like SAVED, APPLIED)
         if status_update.status == JobStatusEnum.VIEWED and existing_status.status != JobStatusEnum.VIEWED:
             # Silently ignore or return current
             return JobStatusResponse(

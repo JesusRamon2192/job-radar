@@ -13,7 +13,7 @@ export interface Job {
   publication_date?: string;
   modality?: string;
   created_at?: string;
-  status?: 'VIEWED' | 'SAVED' | 'APPLIED' | 'SENT';
+  status?: JobStatus;
 }
 
 export interface JobsResponse {
@@ -53,14 +53,16 @@ export const refreshJobs = async (): Promise<{status: string, message: string}> 
   return response.data;
 };
 
+export type JobStatus = 'VIEWED' | 'SAVED' | 'APPLIED' | 'INTERVIEWING' | 'OFFER' | 'REJECTED' | 'ARCHIVED';
+
 export interface JobStatusResponse {
   job_id: string;
-  status: 'VIEWED' | 'SAVED' | 'APPLIED' | 'SENT';
+  status: JobStatus;
   created_at: string;
   updated_at?: string;
 }
 
-export const updateJobStatus = async (job_id: string, status: 'VIEWED' | 'SAVED' | 'APPLIED' | 'SENT'): Promise<JobStatusResponse> => {
+export const updateJobStatus = async (job_id: string, status: JobStatus): Promise<JobStatusResponse> => {
   const response = await axios.post(`${API_URL}/jobs/status`, { job_id, status });
   return response.data;
 };

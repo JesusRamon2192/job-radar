@@ -225,7 +225,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job: initialJob }) => {
                 updateStatus('SAVED');
               }
             }}
-            disabled={job.status === 'SENT'}
+            disabled={job.status !== undefined && job.status !== 'VIEWED' && job.status !== 'SAVED'}
             className={`p-2 rounded-lg transition-colors border ${
               job.status === 'SAVED' 
                 ? 'bg-yellow-500/20 border-yellow-500/30 text-yellow-500' 
@@ -239,13 +239,13 @@ export const JobCard: React.FC<JobCardProps> = ({ job: initialJob }) => {
           <button 
             onClick={(e) => { 
               e.stopPropagation(); 
-              if (job.status !== 'APPLIED' && job.status !== 'SENT') {
+              if (job.status !== 'APPLIED') {
                 if (window.confirm('¿Confirmas que ya aplicaste a esta vacante?')) {
                   updateStatus('APPLIED'); 
                 }
               }
             }}
-            disabled={job.status === 'APPLIED' || job.status === 'SENT'}
+            disabled={job.status === 'APPLIED'}
             className={`p-2 rounded-lg transition-colors border ${job.status === 'APPLIED' ? 'bg-blue-500/20 border-blue-500/30 text-blue-400' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-blue-400 hover:border-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed'}`}
             title="Marcar como Aplicada"
           >

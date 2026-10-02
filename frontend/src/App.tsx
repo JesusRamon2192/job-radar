@@ -15,6 +15,7 @@ import { ResetPassword } from './components/ResetPassword';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { MarketDashboard } from './pages/market/MarketDashboard';
 import { CompanyMarketDashboard } from './pages/market/CompanyMarketDashboard';
+import { TrackerDashboard } from './pages/tracker/TrackerDashboard';
 
 function App() {
   const { token } = useAuth();
@@ -132,6 +133,11 @@ function App() {
         } />
         <Route path="/market" element={<MarketDashboard />} />
         <Route path="/company/:id/market" element={<CompanyMarketDashboard />} />
+        <Route path="/tracker" element={
+          <main className="container mx-auto px-4 mt-8 max-w-[1920px]">
+            <TrackerDashboard />
+          </main>
+        } />
         <Route path="/" element={
           <main className="container mx-auto px-4 mt-4 max-w-6xl min-[1600px]:max-w-[1536px]">
             <DashboardStats jobs={jobs} />

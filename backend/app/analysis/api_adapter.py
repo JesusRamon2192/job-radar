@@ -7,6 +7,7 @@ from app.collectors.greenhouse import GreenhouseCollector
 from app.collectors.axity import AxityCollector
 from app.collectors.hcl import HclCollector
 from app.collectors.mahindra import TechMahindraCollector
+from app.collectors.capgemini import CapgeminiCollector
 from app.services.cache_service import CacheService
 
 def run_profile_match(force_refresh=False):
@@ -19,7 +20,8 @@ def run_profile_match(force_refresh=False):
         "greenhouse": GreenhouseCollector(),
         "axity": AxityCollector(),
         "hcl": HclCollector(),
-        "tech_mahindra": TechMahindraCollector()
+        "tech_mahindra": TechMahindraCollector(),
+        "capgemini": CapgeminiCollector()
     }
     
     all_raw_jobs = []
